@@ -1,0 +1,52 @@
+[*]
+[*] GTKWave Analyzer v3.4.0 (w)1999-2022 BSI
+[*] Tue Aug 26 09:30:05 2025
+[*]
+[dumpfile] "/Users/martin/source/wildcat/test_run_dir/Simulation_CA_cosimulatoin_simple_riscvlabtestssimpleboolbin_should_pass/WildcatTestTop.vcd"
+[dumpfile_mtime] "Tue Aug 26 09:29:09 2025"
+[dumpfile_size] 55572
+[savefile] "/Users/martin/source/wildcat/wildcat.gtkw"
+[timestart] 0
+[size] 1336 600
+[pos] -1 -1
+*-4.905419 15 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] WildcatTestTop.
+[treeopen] WildcatTestTop.cpuTop.
+[sst_width] 255
+[signals_width] 394
+[sst_expanded] 1
+[sst_vpaned_height] 158
+@28
+WildcatTestTop.clock
+WildcatTestTop.reset
+@22
+WildcatTestTop.io_regFile_0[31:0]
+WildcatTestTop.io_regFile_1[31:0]
+WildcatTestTop.io_regFile_2[31:0]
+WildcatTestTop.io_regFile_3[31:0]
+WildcatTestTop.io_regFile_4[31:0]
+WildcatTestTop.io_regFile_5[31:0]
+WildcatTestTop.io_regFile_6[31:0]
+WildcatTestTop.io_regFile_7[31:0]
+WildcatTestTop.io_regFile_8[31:0]
+WildcatTestTop.io_regFile_9[31:0]
+WildcatTestTop.io_regFile_10[31:0]
+WildcatTestTop.cpuTop.cpu.pcReg[31:0]
+WildcatTestTop.cpuTop.cpu.pcNext[31:0]
+WildcatTestTop.cpuTop.cpu.instr[31:0]
+WildcatTestTop.cpuTop.cpu.instrReg[31:0]
+@28
+WildcatTestTop.cpuTop.cpu.io_imem_stall
+@22
+WildcatTestTop.cpuTop.imem.addrReg[31:0]
+WildcatTestTop.cpuTop.imem.instructions_0[31:0]
+WildcatTestTop.cpuTop.imem.instructions_1[31:0]
+WildcatTestTop.cpuTop.imem.instructions_2[31:0]
+WildcatTestTop.cpuTop.imem.instructions_3[31:0]
+WildcatTestTop.cpuTop.imem.instructions_4[31:0]
+WildcatTestTop.cpuTop.imem.instructions_5[31:0]
+@200
+-
+-
+[pattern_trace] 1
+[pattern_trace] 0
