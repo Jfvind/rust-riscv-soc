@@ -2,7 +2,7 @@
 Allows you to run rust code on your FPGA through a Wildcat Risc-V
 
 
-## Prerequisites & Installation
+## :shopping_cart: Prerequisites & Installation
 To run this project, you need to install the following tools.
 
 ### 1. Xilinx Vivado (WebPACK Edition)
