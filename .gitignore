@@ -1,0 +1,88 @@
+# ========================
+# 1. Vivado (Hardware)
+# ========================
+# Ignore the entire build directory created by our Makefile
+hw/vivado/
+
+# Vivado logs and journals (generated in root)
+*.log
+*.jou
+*.str
+*.pb
+*.dcp
+*.bit
+*.bin
+.Xil/
+
+# ========================
+# 2. Rust (Software)
+# ========================
+# Standard Rust build folder
+target/
+**/*.rs.bk
+
+# ========================
+# 3. Chisel / Scala (Wildcat)
+# ========================
+# sbt specific
+dist/
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+.history
+.cache
+.lib/
+
+# Chisel generated files
+test_run_dir/
+*.fir
+*.anno.json
+*.vcd
+*.sv
+
+# IMPORTANT: We usually WANT to keep the generated Verilog 
+# if we are treating Wildcat as a submodule, but if you 
+# generate it fresh every time, you can ignore it.
+# Uncomment the line below to ignore generated Verilog:
+# *.v
+
+# ========================
+# 4. IDEs & Editors
+# ========================
+# VS Code
+.vscode/
+.metals/
+.bloop/
+.bsp/
+
+# IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Eclipse / Scala IDE
+.scala_dependencies
+.worksheet
+.classpath
+.project
+.settings/
+
+# ========================
+# 5. OS System Files
+# ========================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
