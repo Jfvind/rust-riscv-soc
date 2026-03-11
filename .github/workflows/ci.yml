@@ -32,8 +32,11 @@ jobs:
 
       - name: Install RISC-V toolchain
         # gcc-riscv64-unknown-elf is not available on Ubuntu 24.04+; use linux-gnu binutils instead.
-        # The wildcat Makefile auto-detects and falls back to riscv64-linux-gnu- when needed.
-        run: sudo apt-get update && sudo apt-get install -y binutils-riscv64-linux-gnu
+        # Symlink riscv64-unknown-elf-* so external Makefiles (e.g. risc-v-lab) find the expected names.
+        run: |
+          sudo apt-get update && sudo apt-get install -y binutils-riscv64-linux-gnu
+          sudo ln -s /usr/bin/riscv64-linux-gnu-as  /usr/local/bin/riscv64-unknown-elf-as
+          sudo ln -s /usr/bin/riscv64-linux-gnu-ld  /usr/local/bin/riscv64-unknown-elf-ld
 
       - name: Cache sbt
         uses: actions/cache@v4
