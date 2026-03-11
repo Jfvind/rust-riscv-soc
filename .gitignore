@@ -24,6 +24,9 @@ target/
 # ========================
 # 3. Chisel / Scala (Wildcat)
 # ========================
+# External test repo cloned on demand by `make sim-test` — not tracked
+wildcat/risc-v-lab/
+
 # sbt specific
 dist/
 target/

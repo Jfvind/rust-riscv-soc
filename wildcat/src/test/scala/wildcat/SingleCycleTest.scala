@@ -20,8 +20,8 @@ class SingleCycleTest() extends AnyFlatSpec with ChiselScalatestTester {
   progs.foreach(p => {
     println(s"Running test $p")
     s"Program $p" should "pass" in {
-      "rm a.out".!
-      s"make app APP=$p".!
+      new java.io.File("a.out").delete()
+      s"${wsl}make app APP=${wslPath(p)}".!
       //    test(new FiveCats(Array("a.out"))).withAnnotations(Seq(WriteVcdAnnotation)) {
       test(new SingleCycle("a.out")).withAnnotations(Seq(WriteVcdAnnotation)) {
         d => {

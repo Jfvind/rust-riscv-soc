@@ -21,8 +21,8 @@ class WildcatTest() extends AnyFlatSpec with ChiselScalatestTester {
     s"Program $p" should "pass" in {
       var app = p
       if (p.endsWith(".s")) {
-        "rm a.out".!
-        s"make app APP=$p".!
+        new java.io.File("a.out").delete()
+        s"${wsl}make app APP=${wslPath(p)}".!
         app = "a.out"
       }
       //    test(new FiveCats(Array("a.out"))).withAnnotations(Seq(WriteVcdAnnotation)) {

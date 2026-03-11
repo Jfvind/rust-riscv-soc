@@ -10,7 +10,7 @@ class SimulatorTest extends AnyFlatSpec {
   val files = Util.getAllTests()
   for (f <- files) {
     s"Simulator $f" should "pass" in {
-      s"make app APP=$f".!
+      s"${Util.wsl}make app APP=${Util.wslPath(f)}".!
       val sim = SimRV.runSimRV("a.out")
       assert(sim.reg(10) == 0, f"Failed case ${sim.reg(3)}")
     }

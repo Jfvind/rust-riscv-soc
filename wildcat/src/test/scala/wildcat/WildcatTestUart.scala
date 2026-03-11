@@ -36,8 +36,8 @@ class WildcatTestUart(ignore: String) extends AnyFlatSpec with ChiselScalatestTe
     s"Program $p" should "pass" in {
       var app = p
       if (p.endsWith(".s")) {
-        "rm a.out".!
-        s"make app APP=$p".!
+        new java.io.File("a.out").delete()
+        s"${wsl}make app APP=${wslPath(p)}".!
         app = "a.out"
       }
       test(new UartTest(app)).withAnnotations(Seq(WriteVcdAnnotation, VerilatorBackendAnnotation)) {

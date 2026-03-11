@@ -6,11 +6,19 @@
 
 SBT = sbt
 UNAME := $(shell uname)
+IS_WSL := $(shell grep -qi microsoft /proc/version 2>/dev/null && echo yes)
 ifeq ($(UNAME),Darwin)
 # assuming tools are installed with Mac Homebrew
 export CROSS=riscv64-elf-
-else
+else ifeq ($(IS_WSL),yes)
+# Running inside Windows Subsystem for Linux (WSL) - use linux-gnu binutils
+export CROSS=riscv64-linux-gnu-
+else ifneq ($(shell which riscv64-unknown-elf-as 2>/dev/null),)
+# riscv64-unknown-elf toolchain found (Ubuntu 22.04 and earlier)
 export CROSS=riscv64-unknown-elf-
+else
+# Fallback: linux-gnu binutils (Ubuntu 24.04+, where riscv64-unknown-elf is not packaged)
+export CROSS=riscv64-linux-gnu-
 endif
 APP=asm/play.s
 #APP=asm/riscv-v1_addi.s

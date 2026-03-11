@@ -3,54 +3,92 @@ Allows you to run rust code on your FPGA through a Wildcat Risc-V
 
 
 ## :shopping_cart: Prerequisites & Installation
-To run this project, you need to install the following tools.
 
-### 1. Xilinx Vivado (WebPACK Edition)
-Required for synthesizing the hardware and flashing the FPGA.
+### :rocket: Running Rust on the CPU
+_Everything you need to write Rust programs and execute them on the FPGA._
+
+#### 1. Make (Build Tool)
+Required to run the automation scripts.
+
+- Windows:
+    - Option A (Recommended): Install via Chocolatey. Open PowerShell as Admin and run: ```choco install make```
+    - Option B: Download GnuWin32 Make, install it, and add C:\Program Files (x86)\GnuWin32\bin to your PATH.
+- Linux:
+    - Ubuntu/Debian: ```sudo apt install make```
+    - Fedora: ```sudo dnf install make```
+
+#### 2. Xilinx Vivado (WebPACK Edition)
+Required for synthesizing the hardware and flashing the FPGA. Only needed once to program the non-volatile flash.
 
 - **Download:** Xilinx Unified Installer
 - **Install:** Select "Vivado Standard" or "WebPACK" (Free).
 - **Important:** During installation, ensure you install the Cable Drivers.
-- **System PATH:** After installation, you must add the Vivado bin folder to your system PATH so the terminal can  find the *vivado* command.
-    - *Windows:* Add C:\Xilinx\Vivado\20xx.x\bin to Environment Variables -> Path.
-    - *Linux/Mac:* Add source /tools/Xilinx/Vivado/20xx.x/settings64.sh to your .bashrc or .zshrc.
-### 2. Make (Build Tool)
-Required to run the automation scripts.
+- **System PATH:** After installation, add the Vivado bin folder to your system PATH so the terminal can find the *vivado* command.
+    - *Windows:* Add `C:\Xilinx\Vivado\20xx.x\bin` to Environment Variables → Path.
+    - *Linux:* Add `source /tools/Xilinx/Vivado/20xx.x/settings64.sh` to your `.bashrc` or `.zshrc`.
 
-- Windows:
-    - Option A (Recommended): Install via Chocolatey. Open PowerShell as Admin and run: choco install make
-    - Option B: Download GnuWin32 Make, install it, and add C:\Program Files (x86)\GnuWin32\bin to your PATH.
-- macOS:
-    - Open Terminal and run: xcode-select --install
-- Linux:
-    - Ubuntu/Debian: sudo apt install make
-    - Fedora: sudo dnf install make
-### 3. RISC-V Toolchain (GCC)
-Required to compile C/Rust code for the processor.
+#### 3. Rust Toolchain
+Required to compile the Rust program that runs on the FPGA.
 
-- Windows:
-    - Download the xPack RISC-V Embedded GCC.
-    - Extract it and add the bin folder to your PATH.
-- macOS:
-    - brew tap riscv-software-src/riscv
-    - brew install riscv-tools
-- Linux:
-    - Ubuntu: sudo apt install gcc-riscv64-unknown-elf
-### 4. Python 3
+- **Install rustup:** [rustup.rs](https://rustup.rs/)
+    ```bash
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+    ```
+- **Add the RISC-V 32-bit target:**
+    ```bash
+    rustup target add riscv32i-unknown-none-elf
+    ```
+- **Install cargo-binutils** (for `cargo objcopy`):
+    ```bash
+    cargo install cargo-binutils
+    rustup component add llvm-tools
+    ```
+
+#### 4. Python 3
 Required for the UART upload script.
 
-- Windows/Mac/Linux: Download from python.org.
-- Dependencies: Install the serial library:
-```bash
-pip install pyserial
-```
-### 5. Git
-Required for version control and downloading the processor core.
+- Windows/Linux: Download from [python.org](https://python.org).
+- Install the serial library:
+    ```bash
+    pip install pyserial
+    ```
 
-- Download: git-scm.com
+#### 5. Git
+Required for cloning this repository.
+
+- Download: [git-scm.com](https://git-scm.com)
+
+---
+
+### :wrench: Developing on the CPU
+_Additional tools needed to modify the CPU hardware (Chisel) and run simulation tests._
+
+#### 6. Java 17+ (JDK)
+Required by sbt and the Chisel hardware generator.
+
+- Windows/Linux: Download from [Adoptium](https://adoptium.net/) (Eclipse Temurin 17+).
+- Linux (Ubuntu): ```sudo apt install openjdk-17-jdk```
+- Verify: ```java -version```
+
+#### 7. sbt (Scala Build Tool)
+Required to compile Chisel (`make generate-verilog`) and run simulation tests (`make sim-test`).
+
+- All platforms: Follow the install guide at [scala-sbt.org](https://www.scala-sbt.org/download.html).
+- Linux (Ubuntu): ```sudo apt install sbt``` (after adding the sbt apt repository).
+- Verify: ```sbt --version```
+
+#### 8. RISC-V Assembler/Linker
+Required to assemble the simulation test programs (`make sim-test`). Not needed for building or flashing the FPGA.
+
+- **Windows:** WSL (Windows Subsystem for Linux) with the linux-gnu binutils:
+    1. Install WSL (from an admin PowerShell): `wsl --install`
+    2. Inside WSL: `sudo apt-get install -y make binutils-riscv64-linux-gnu`
+- **Linux (Ubuntu 24.04+):** `sudo apt-get install -y binutils-riscv64-linux-gnu`
+- **Linux (Ubuntu 22.04 and earlier):** `sudo apt-get install -y gcc-riscv64-unknown-elf`
 
 ## :rocket: Getting started
-For now a simple blink program counts binary with the 16 LEDs on the basys3 board.
+For now a simple program turns on one LED, sends "PASS" and turn on the eigth rightmost LEDs. 
+**Note:** When CPU is running, the leftmost LED is lit.
 
 ### 1. Clone repo
 ```bash
@@ -58,7 +96,7 @@ git clone https://github.com/Jfvind/rust-riscv-soc
 cd rust-riscv-soc
 ```
 ### 2. Flash
-Build top.bin from hw/src/top.v and flash to Basys3
+Build RustSoCTop.bin from wildcat/src/main/scala/rvsoc/RustSoCTop.scala and flash to Basys3
 - **Dependency:** Make sure Basys3 is connected and turned on (And 'Prerequisites & Installation' is completed)
 ```bash
 make flash
@@ -68,12 +106,42 @@ make flash
     - Makes a Vivado project at hw/vivado
     - Generates .jou and .log in root
     - Generates /.Xil in root
-- *Note*: it is possible to only build the .bin and .bit files using *make build*, this doesn't flash the FPGA memory.
+- *Note*: it is possible to only build the .bin and .bit files using `make build`, this doesn't flash the FPGA memory.
 
 ### :arrow_forward: 3. PROG
 Press the red button in top right corner of the Basys3.
-After 5-10 seconds you program should be running on the FPGA, stores in the non-volatile memory.
+After 5-10 seconds the CPU should be running on the FPGA, stored in the non-volatile memory.
 
-### :broom: 4. Clean up (Optional)
-Since the program is stored in the flash memory, the generated files are not necessary.
-**Note:** if making changes to the top.v and the hw/vivado is cleaned away, then *make flash* will take longer (~1 min)
+### 🔌 4. Upload Rust
+**First:** locate the comport you FPGA uses to connect to the pc:
+*Windows:* 
+```powershell
+Get-PnpDevice -Class Ports -PresentOnly | Select-Object -Property FriendlyName
+```
+Look for something like "USB Serial Port (COM5)". Port name is COM5.
+
+*Linux:*
+```bash
+ls /dev/ttyUSB* /dev/ttyACM* 2>/dev/null
+```
+Look for something like /dev/ttyUSB0 or /dev/ttyUSB1.
+
+**Note:** If you don't know which port is your FPGA, then unplug it, run the command, and plug it in again and run the command once more.
+
+**Second:** Upload rust code
+```bash
+make upload
+```
+**Note:** You can re-upload anytime after changin the rust file and then running ```make upload``` again.
+
+### :broom: 5. Clean up (Optional)
+Since the CPU is stored in the flash memory, the generated files are not necessary.
+**Note:** if making changes to the CPU and the hw/vivado is cleaned away, then *make flash* will take longer.
+
+## Changes to schoeberl/wildcat
+Static version from feb-2026.
+
+- Added top module instantiating bootloader at src/main/scala/rvsoc.
+- Added WSL detection in src/main/scala/Util.scala for running tests in powershell.
+- Changed calling of make app to correct path for powershell calling (SimulatorTest, SingleCycleTest, WildcatTest, WildcatTestUart).
+- Added WSL detection in Makefile for binary compilation (riscv64 toolchain).

@@ -1,4 +1,4 @@
-# Connect to the board
+# Connect to the board (Can only be found if only one board is connected)
 open_hw_manager
 connect_hw_server
 open_hw_target
@@ -6,7 +6,7 @@ open_hw_target
 set device [lindex [get_hw_devices] 0]
 current_hw_device $device
 
-# Add the Configuration Memory (Macronix mx25l3273f)
+# Add Configuration Memory (Macronix mx25l3273f (for Basys3))
 create_hw_cfgmem -hw_device $device -mem_dev [lindex [get_cfgmem_parts mx25l3273f-spi-x1_x2_x4] 0]
 
 set mem_device [get_property PROGRAM.HW_CFGMEM [lindex [get_hw_devices] 0]]
@@ -25,7 +25,7 @@ set_property PROGRAM.CFG_PROGRAM  1 $mem_device
 set_property PROGRAM.VERIFY  1 $mem_device
 set_property PROGRAM.CHECKSUM  0 $mem_device
 
-# Flash it!
+# Flashing to board.
 puts "Flashing $bin_file to device..."
 startgroup 
     if {![string equal [get_property PROGRAM.HW_CFGMEM_TYPE $device] [get_property MEM_TYPE [get_property CFGMEM_PART $mem_device]]] }  { 
