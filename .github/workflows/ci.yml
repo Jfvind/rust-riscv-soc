@@ -30,6 +30,9 @@ jobs:
           java-version: "17"
           distribution: "temurin"
 
+      - name: Set up sbt
+        uses: sbt/setup-sbt@v1
+
       - name: Install RISC-V toolchain
         # gcc-riscv64-unknown-elf is not available on Ubuntu 24.04+; use linux-gnu packages instead.
         # Symlink riscv64-unknown-elf-* so external Makefiles (e.g. risc-v-lab) find the expected names.
