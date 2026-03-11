@@ -34,14 +34,17 @@ jobs:
         uses: sbt/setup-sbt@v1
 
       - name: Install RISC-V toolchain
-        # gcc-riscv64-unknown-elf is not available on Ubuntu 24.04+; use linux-gnu packages instead.
-        # Symlink riscv64-unknown-elf-* so external Makefiles (e.g. risc-v-lab) find the expected names.
+        # Use bare-metal gcc-riscv64-unknown-elf (universe repo) for correct bare-metal C compilation.
+        # binutils-riscv64-unknown-elf doesn't exist on Ubuntu 24.04, so use linux-gnu binutils
+        # and symlink them to the expected riscv64-unknown-elf-* names.
         run: |
-          sudo apt-get update && sudo apt-get install -y binutils-riscv64-linux-gnu gcc-riscv64-linux-gnu
-          # Symlink every riscv64-linux-gnu-* tool to riscv64-unknown-elf-* so external
-          # Makefiles (e.g. risc-v-lab) find the expected names on Ubuntu 24.04+.
+          sudo add-apt-repository -y universe
+          sudo apt-get update && sudo apt-get install -y binutils-riscv64-linux-gnu gcc-riscv64-unknown-elf
+          # Symlink every riscv64-linux-gnu-* binutils tool that isn't already provided
+          # by gcc-riscv64-unknown-elf (i.e. as, ld, objcopy, objdump, etc.).
           for f in /usr/bin/riscv64-linux-gnu-*; do
-            sudo ln -s "$f" "/usr/local/bin/riscv64-unknown-elf-${f##*riscv64-linux-gnu-}"
+            name="riscv64-unknown-elf-${f##*riscv64-linux-gnu-}"
+            command -v "$name" &>/dev/null || sudo ln -s "$f" "/usr/local/bin/$name"
           done
 
       - name: Cache sbt
