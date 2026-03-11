@@ -19,6 +19,11 @@ import net.fornwall.jelf.ElfFile
 
 object Util {
 
+  /** Prefix for Linux-native commands on Windows (WSL). Empty string on Linux/macOS. */
+  val wsl: String = if (scala.util.Properties.isWin) "wsl " else ""
+
+  /** Convert Windows backslashes to forward slashes for use in WSL/bash commands. */
+  def wslPath(p: String): String = if (scala.util.Properties.isWin) p.replace('\\', '/') else p
 
   private def byteToWord(byteArray: Array[Byte]) = {
     val arr = new Array[Int](math.max(1, byteArray.length / 4))
