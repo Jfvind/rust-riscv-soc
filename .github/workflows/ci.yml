@@ -35,9 +35,11 @@ jobs:
         # Symlink riscv64-unknown-elf-* so external Makefiles (e.g. risc-v-lab) find the expected names.
         run: |
           sudo apt-get update && sudo apt-get install -y binutils-riscv64-linux-gnu gcc-riscv64-linux-gnu
-          sudo ln -s /usr/bin/riscv64-linux-gnu-as  /usr/local/bin/riscv64-unknown-elf-as
-          sudo ln -s /usr/bin/riscv64-linux-gnu-ld  /usr/local/bin/riscv64-unknown-elf-ld
-          sudo ln -s /usr/bin/riscv64-linux-gnu-gcc /usr/local/bin/riscv64-unknown-elf-gcc
+          # Symlink every riscv64-linux-gnu-* tool to riscv64-unknown-elf-* so external
+          # Makefiles (e.g. risc-v-lab) find the expected names on Ubuntu 24.04+.
+          for f in /usr/bin/riscv64-linux-gnu-*; do
+            sudo ln -s "$f" "/usr/local/bin/riscv64-unknown-elf-${f##*riscv64-linux-gnu-}"
+          done
 
       - name: Cache sbt
         uses: actions/cache@v4
