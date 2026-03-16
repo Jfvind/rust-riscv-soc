@@ -1,5 +1,5 @@
 # rust-riscv-soc
-Allows you to run rust code on your FPGA through a Wildcat Risc-V
+Allows you to run rust code on your FPGA through a Wildcat Risc-V.
 
 
 ## :shopping_cart: Prerequisites & Installation
