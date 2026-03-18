@@ -130,7 +130,7 @@ Look for something like /dev/ttyUSB0 or /dev/ttyUSB1.
 
 **Second:** Upload rust code
 ```bash
-make upload
+make upload SERIAL_PORT=<your_COM_port>
 ```
 **Note:** You can re-upload anytime after changin the rust file and then running ```make upload``` again.
 
