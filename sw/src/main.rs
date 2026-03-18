@@ -1,69 +1,77 @@
 #![no_std]
 #![no_main]
 
-use core::arch::global_asm;
 use core::panic::PanicInfo;
+use core::arch::global_asm;
 
-// 1. HARDWARE ENTRY POINT (ASSEMBLY)
-// FPGA turns on and the CPU starts, and the first code that runs is this assembly section.
-// It sets up the stack pointer so we can safely run Rust functions.
-global_asm!(
-    ".section .init",
-    ".global _start",
-    "_start:",
-    "la sp, _stack_start",  //load stack adress from linker script
-    "j rust_entry"          // jump to rust entry point -> skipping any C runtime setup, as we dont use it
-);
+// ── 1. Hardware-adresser ────────────────────────────────────
+const UART_STATUS: *const u32 = 0xF000_0000 as *const u32;
+const UART_DATA: *mut u32 = 0xF000_0004 as *mut u32;
+const LED_REG: *mut u32 = 0xF010_0000 as *mut u32;
 
-// 2. IMPORT SYMBOLS FROM LINKER SCRIPT
+// ── 2. Linker symboler (Fra linker.ld) ──────────────────────────────────────
 extern "C" {
-    static mut _sbss: u32;
-    static mut _ebss: u32;
-    static mut _sdata: u32;
-    static mut _edata: u32;
-    static _sidata: u32;
+    static mut __bss_start: u32;
+    static mut __bss_end: u32;
 }
 
-// 3. RUST ENTRY POINT (MEMORY SETUP)
+// ── 3. Boot sekvens (Assembly) ──────────────────────────────────────────────
+global_asm!(
+    ".section .text._start",
+    ".global _start",
+    "_start:",
+    "la sp, _stack_top",    // Sæt stack pointeren (defineret i linker.ld)
+    "j rust_entry"          // Hop ned til Rust-miljøet
+);
+
+// ── 4. Boot sekvens (Rust) ──────────────────────────────────────────────────
 #[no_mangle]
 pub unsafe extern "C" fn rust_entry() -> ! {
-    // restart .bss section to 0, as it may contain random data from the FPGA's SRAM on power-up
-    let mut bss_ptr = core::ptr::addr_of_mut!(_sbss);
-    let bss_end = core::ptr::addr_of_mut!(_ebss);
+    // Nulstil .bss for at undgå at læse SRAM støj som formentligt er der ved opstart
+    let mut bss_ptr = core::ptr::addr_of_mut!(__bss_start); // Startadresse for .bss
+    let bss_end = core::ptr::addr_of_mut!(__bss_end); // Slutadresse for .bss
+
     while bss_ptr < bss_end {
-        core::ptr::write_volatile(bss_ptr, 0);
-        bss_ptr = bss_ptr.offset(1);
-    }
-    //copy .data section from ROM to RAM, as it may contain random data from the FPGA's SRAM on power-up
-    let mut data_ptr = core::ptr::addr_of_mut!(_sdata);
-    let data_end = core::ptr::addr_of_mut!(_edata);
-    let mut sidata_ptr = core::ptr::addr_of!(_sidata);
-    while data_ptr < data_end {
-        let value = core::ptr::read_volatile(sidata_ptr);
-        core::ptr::write_volatile(data_ptr, value);
-        data_ptr = data_ptr.offset(1);
-        sidata_ptr = sidata_ptr.offset(1);
+        core::ptr::write_volatile(bss_ptr, 0); // Skriv 0 til hver adresse i .bss
+        bss_ptr = bss_ptr.offset(1); // næste adresse -> 4 bytes videre, da vi skriver u32
     }
 
-    // jmp to app
+    // Uploadet er styret i upload.py og linker.ld, så vi kan bare hoppe til programmet her
     main();
 
-    // Fallback if main thows an error or returns, which it shouldn't, but just in case, we don't want to run off into the void.
     loop {}
 }
 
-// 4. APPLICATION ENTRY POINT
+// ── 5. Applikationen ────────────────────────────────────────────────────────
 fn main() {
-    // TODO:  UART, læs knapper, tænd LEDs.
+    led_write(0x01);
+    uart_print("PASS\n"); //Jeppes test for at se om uart virker
+    led_write(0xFF);
+}
 
-    loop {
-        // Main loop
+// ── 6. Rå Hardware Hjælpere  ──────────────────────────────────
+fn uart_putc(c: u8) { // Vent indtil UART er klar til at sende, og skriv derefter karakteren til UART-dataregistret
+    unsafe {
+        while (UART_STATUS.read_volatile() & 0x1) == 0 {}
+        UART_DATA.write_volatile(c as u32);
     }
 }
 
-// 5. PANIC HANDLER required by Rust, called when a panic occurs (e.g. unwrap on None, out of bounds access, etc.)
+fn uart_print(s: &str) { // Skriv hver byte i strengen til UART-dataregistret ved hjælp af uart_putc
+    for b in s.bytes() {
+        uart_putc(b);
+    }
+}
+
+fn led_write(val: u8) { // Skriv værdien til LED-registret for at styre LED'erne
+    unsafe {
+        LED_REG.write_volatile(val as u32);
+    }
+}
+
+// ── 7. Panic Handler ────────────────────────────────────────────────────────
 #[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
-    //TODO: Indtil vi har UART print klar, fryser vi bare systemet ved fejl.
+fn panic(_info: &PanicInfo) -> ! { // Hvis der opstår en panic, skriv 'E' til UART for at indikere en fejl, og bliv i en uendelig løkke
+    unsafe { UART_DATA.write_volatile(b'E' as u32); }
     loop {}
 }
