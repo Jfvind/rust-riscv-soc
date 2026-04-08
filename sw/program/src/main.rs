@@ -116,8 +116,8 @@ fn main() {
 
     loop {
         // 1. Read hardware peripherals
-        let adc_val = unsafe { ADC_REG.read_volatile() }; // Returns 0 to 4095
-        let btn_val = unsafe { BTN_REG.read_volatile() }; // Returns 4-bit button state
+        let adc_val = adc_read(); // Returns 0 to 4095
+        let btn_val = btn_read(); // Returns 4-bit button state
 
         // 2. Logic: Map ADC to Onboard LEDs (Bits 0 to 6) like a volume bar graph
         let mut onboard_leds = 0;
@@ -137,9 +137,7 @@ fn main() {
         // 4. Combine and write to LED register
         // Note: LED[7] is ignored by hardware, so we can leave it 0
         let final_led_output = onboard_leds | pmod_leds;
-        unsafe {
-            LED_REG.write_volatile(final_led_output);
-        }
+        led_write(final_led_output);
 
         // 5. Small delay to prevent spamming and flickering
         for _ in 0..500_000 {
