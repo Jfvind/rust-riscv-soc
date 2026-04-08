@@ -47,6 +47,8 @@ class RustSoCTop(frequ: Int = 100000000, baudRate: Int = 115200, memBytes: Int =
     val tx  = Output(UInt(1.W))
     val rx  = Input(UInt(1.W))
     val btn = Input(UInt(4.W))
+    val vauxp6 = Input(Bool())
+    val vauxn6 = Input(Bool())
   })
 
   // ---- Reset monitor ----
@@ -136,6 +138,10 @@ class RustSoCTop(frequ: Int = 100000000, baudRate: Int = 115200, memBytes: Int =
     cpu.io.dmem.ack    := false.B
   }
 
+  val adc = withReset(combinedReset) { Module(new AdcController())}
+  adc.io.vauxp6 := io.vauxp6
+  adc.io.vauxn6 := io.vauxn6
+
   // ---- UART for CPU ----
   // With combinedReset so any Tx/Rx is aborted on software reset.
   val uartTx = withReset(combinedReset) { Module(new BufferedTx(frequ, baudRate)) }
@@ -165,11 +171,6 @@ class RustSoCTop(frequ: Int = 100000000, baudRate: Int = 115200, memBytes: Int =
     }
   }
 
-  // Buttons read at 0xF020_0000
-  when(cpuRunning && (memAddressReg(31, 28) === 0xf.U) && memAddressReg(23, 20) === 2.U) {
-    cpu.io.dmem.rdData := io.btn
-  }
-
   // LED register at 0xF010_0000.
   val ledReg = withReset(combinedReset) { RegInit(0.U(16.W)) }
   when(cpuRunning && (cpu.io.dmem.address(31, 28) === 0xf.U) && cpu.io.dmem.wr) {
@@ -186,6 +187,16 @@ class RustSoCTop(frequ: Int = 100000000, baudRate: Int = 115200, memBytes: Int =
 
   // LED output: MSB = cpuRunning indicator, lower 8 bits = ledReg, bit 15 downto 8 are GPIO LED
   io.led := RegNext(ledReg(15, 8)) ## cpuRunning ## RegNext(ledReg(6, 0))
+
+  // Buttons read at 0xF020_0000
+  when(cpuRunning && (memAddressReg(31, 28) === 0xf.U) && memAddressReg(23, 20) === 2.U) {
+    cpu.io.dmem.rdData := io.btn
+  }
+
+  // ADC read at 0xF030_0000
+  when(cpuRunning && (memAddressReg(31, 28) === 0xf.U) && (memAddressReg(23, 20) === 3.U)) {
+    cpu.io.dmem.rdData := adc.io.adcData
+  }
 }
 
 /**
