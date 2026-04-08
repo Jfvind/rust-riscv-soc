@@ -137,7 +137,7 @@ fn main() {
         // 4. Combine and write to LED register
         // Note: LED[7] is ignored by hardware, so we can leave it 0
         let final_led_output = onboard_leds | pmod_leds;
-        led_write(final_led_output);
+        led_write(final_led_output.try_into().unwrap());
 
         // 5. Small delay to prevent spamming and flickering
         for _ in 0..500_000 {
