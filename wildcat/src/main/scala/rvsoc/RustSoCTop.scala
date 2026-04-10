@@ -218,6 +218,7 @@ class RustSoCTop(frequ: Int = 100000000, baudRate: Int = 115200, memBytes: Int =
     .elsewhen(memAddressReg(3, 0) === 4.U)  { cpu.io.dmem.rdData := adc.io.adcData1 } // 0xF030_0004
     .elsewhen(memAddressReg(3, 0) === 8.U)  { cpu.io.dmem.rdData := adc.io.adcData2 } // 0xF030_0008
     .elsewhen(memAddressReg(3, 0) === 12.U) { cpu.io.dmem.rdData := adc.io.adcData3 } // 0xF030_000C
+  }
 }
 
 /**

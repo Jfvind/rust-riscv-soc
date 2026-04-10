@@ -77,26 +77,26 @@ class AdcController extends Module {
   val dataReg = RegInit(VecInit(Seq.fill(4)(0.U(16.W))))
 
   // State Machine for DRP Bus
-  val request :: wait :: Nil = Enum(2)
-  val state = RegInit(request)
+  val sRequest :: sWait :: Nil = Enum(2)
+  val state = RegInit(sRequest)
   val auxIdx = RegInit(0.U(2.W))
 
   xadc.io.daddr_in := drpAddrs(auxIdx)
   xadc.io.di_in    := 0.U     // Not used (We only read, not write)
   xadc.io.dwe_in   := false.B // Read only, never write
-  xadc.io.den_in   := (state === request)
+  xadc.io.den_in   := (state === sRequest)
 
 
   switch(state) {
-    is(request) {
-      state := wait // DRP Enable high for 1 cycle
+    is(sRequest) {
+      state := sWait // DRP Enable high for 1 cycle
     }
-    is(wait) {
+    is(sWait) {
       // drdy_out pulses high when the DRP spits out the data
       when(xadc.io.drdy_out) {
         dataReg(auxIdx) := xadc.io.do_out // Capture the 16-bit analog value
         auxIdx := auxIdx + 1.U // Next channel
-        state := request
+        state := sRequest
       }
     }
   }
