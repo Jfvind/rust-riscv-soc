@@ -10,6 +10,7 @@ const UART_STATUS: *const u32 = 0xF000_0000 as *const u32;
 const UART_DATA: *mut u32 = 0xF000_0004 as *mut u32;
 const LED_REG: *mut u32 = 0xF010_0000 as *mut u32;
 const BTN_REG: *const u32 = 0xF020_0000 as *const u32;
+const ADC_BASE: *const u32 = 0xF030_0000 as *const u32;
 
 // ── 2. Linker symboler (Fra linker.ld) ──────────────────────────────────────
 extern "C" {
@@ -86,7 +87,7 @@ macro_rules! println {
     ($($arg:tt)*) => ($crate::print!("{}\n", format_args!($($arg)*)));
 }
 
-// ── 7. HAL: LED helper + BTN helper ─────────────────────────────────────────────────────
+// ── 7. HAL: LED helper + BTN helper + ADC helper ─────────────────────────────────────────────────────
 fn led_write(val: u16) { // LED = 1 on, LED = 0 off, bitmask for 16 LEDs
     unsafe {
         LED_REG.write_volatile(val as u32);
@@ -99,25 +100,54 @@ fn btn_read() -> u32 {
     }
 }
 
+fn adc_read_all() -> [u32; 4] {
+    unsafe {
+        [
+            ADC_BASE.offset(0).read_volatile(), // 0xF030_0000
+            ADC_BASE.offset(1).read_volatile(), // 0xF030_0004
+            ADC_BASE.offset(2).read_volatile(), // 0xF030_0008
+            ADC_BASE.offset(3).read_volatile()  // 0xF030_000C
+        ]
+    }
+}
+
 // ── 8. APP ────────────────────────────────────────────────────────
 fn main() {
-    // Tænd den første LED for at vise, at CPU'en lever + BLÅ LED
-    led_write(0x401);
     
     // Use safe HAL for writing to UART
     println!("=== DTU MCU Booted ===");
     println!("SRAM Size: {} bytes", 4096);
     println!("Status: PASS");
 
-    // Tænd 7 mest højrestående LEDer på boardet + RØD og GRØN LED
-    led_write(0x3FF);
-
-    // Button-blink demo: LEDs afspejler knaptryk
-    // Note: Physical LED 7 is hardwired to the cpuRunning signal and cannot be controlled from software
-    println!("Entering button mode...");
     loop {
-        let buttons = btn_read();
-        led_write(buttons as u16);
+        // 1. Read hardware peripherals
+        let adc_val = adc_read_all(); // Returns 0 to 4095 for all four inputs
+        let btn_val = btn_read(); // Returns 4-bit button state
+
+        // 2. Logic: Map ADC to Onboard LEDs (Bits 0 to 6) like a volume bar graph
+        let mut onboard_leds = 0;
+        if adc_val[0] > 500  { onboard_leds |= 0b0000001; } // LED 0
+        if adc_val[0] > 1000 { onboard_leds |= 0b0000011; } // LED 1
+        if adc_val[0] > 1500 { onboard_leds |= 0b0000111; } // LED 2
+        if adc_val[0] > 2000 { onboard_leds |= 0b0001111; } // LED 3
+        if adc_val[0] > 2500 { onboard_leds |= 0b0011111; } // LED 4
+        if adc_val[0] > 3000 { onboard_leds |= 0b0111111; } // LED 5
+        if adc_val[0] > 3500 { onboard_leds |= 0b1111111; } // LED 6
+
+        // 3. Logic: Map Buttons to PMOD LEDs (Bits 8, 9, 10)
+        // BTN[0] -> LED[8], BTN[1] -> LED[9], BTN[2] -> LED[10]
+        // We isolate the lowest 3 buttons (0b111) and shift them left by 8
+        let pmod_leds = (btn_val & 0b111) << 8;
+
+        // 4. Combine and write to LED register
+        // Note: LED[7] is ignored by hardware, so we can leave it 0
+        let final_led_output = onboard_leds | pmod_leds;
+        led_write(final_led_output as u16);
+
+        // 5. Small delay to prevent spamming and flickering
+        for _ in 0..500_000 {
+            unsafe { core::arch::asm!("nop"); }
+        }
     }
 }
 
