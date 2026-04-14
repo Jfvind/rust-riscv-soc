@@ -151,6 +151,7 @@ class RustSoCTop(frequ: Int = 100000000, baudRate: Int = 115200, memBytes: Int =
     cpu.io.dmem.ack    := false.B
   }
 
+  // ---- A2D Converter ----
   val adc = withReset(combinedReset) { Module(new AdcController())}
   adc.io.vauxp6   := io.vauxp6
   adc.io.vauxn6   := io.vauxn6
@@ -160,6 +161,16 @@ class RustSoCTop(frequ: Int = 100000000, baudRate: Int = 115200, memBytes: Int =
   adc.io.vauxn7   := io.vauxn7
   adc.io.vauxp15  := io.vauxp15
   adc.io.vauxn15  := io.vauxn15
+
+  // ---- PWM Controller ----
+  val pwm = withReset(combinedReset) { Module(new PwmController()) }
+  val pwmEnable = withReset(combinedReset) { RegInit(0.U(7.W)) } // Bitmask to enable pwm signal for respective LED
+  val pwmDutyRegs = withReset(combinedReset) { RegInit(VecInit(Seq.fill(7)(0.U(8.W)))) } // Registers that holds respective duty cycle value for comparison in PWM module to control perceived brightness
+
+  // Connect duty registers to PWM module
+  for (i <- 0 until 7) {
+    pwm.io.duty(i) := pwmDutyRegs(i)
+  }
 
   // ---- UART for CPU ----
   // With combinedReset so any Tx/Rx is aborted on software reset.
