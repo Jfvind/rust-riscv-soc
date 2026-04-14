@@ -210,6 +210,16 @@ class RustSoCTop(frequ: Int = 100000000, baudRate: Int = 115200, memBytes: Int =
     }.elsewhen(cpu.io.dmem.address(23, 20) === 1.U) {
       // LED register write
       ledReg := cpu.io.dmem.wrData(15, 0)
+    }.elsewhen (cpu.io.dmem.address(23, 20) === 4.U) {
+      // PWMregisters: offset 0x00 = enable, 0x04-01C = duty cycle ch 0 - 6
+      when (cpu.io.dmem.adress(4, 2) === 0.U) {
+        pwmEnable := cpu.io.dmem.wrData(6,0)
+      }
+      for (i <- 0 until 7) {
+        when (cpu.io.dmem.address(4, 2) === (i + 1).U) {
+          pwmDutyRegs(i) := cpu.io.dmem.wrData(7,0)
+        }
+      }
     }
     // Prevent IO-mapped writes from reaching the scratchpad memory.
     dmem.io.wr := false.B
@@ -217,6 +227,14 @@ class RustSoCTop(frequ: Int = 100000000, baudRate: Int = 115200, memBytes: Int =
 
   // LED output: MSB = cpuRunning indicator, lower 8 bits = ledReg, bit 15 downto 8 are GPIO LED
   io.led := RegNext(ledReg(15, 8)) ## cpuRunning ## RegNext(ledReg(6, 0))
+
+  // Mux between direct LED register and PWM output per channel
+  val onboardBits = wire(Vec(7, Bool()))
+  for (i <- 0 until 7) {
+    onboardBits(i) := Mux(pwmEnable(i), pwm.io.pwmOut(i), ledReg(i))
+  }
+  io.led := RegNext(ledReg(15,8)) ## cpuRunning ## RegNext(onboardBits.asUint)
+  
 
   // Buttons read at 0xF020_0000
   when(cpuRunning && (memAddressReg(31, 28) === 0xf.U) && memAddressReg(23, 20) === 2.U) {
@@ -229,6 +247,14 @@ class RustSoCTop(frequ: Int = 100000000, baudRate: Int = 115200, memBytes: Int =
     .elsewhen(memAddressReg(3, 0) === 4.U)  { cpu.io.dmem.rdData := adc.io.adcData1 } // 0xF030_0004
     .elsewhen(memAddressReg(3, 0) === 8.U)  { cpu.io.dmem.rdData := adc.io.adcData2 } // 0xF030_0008
     .elsewhen(memAddressReg(3, 0) === 12.U) { cpu.io.dmem.rdData := adc.io.adcData3 } // 0xF030_000C
+  }
+
+  // PWM read at 0xF040_00X
+  when(cpuRunning && (memAddressReg(31,28) === 0xf.U) && (memAddressReg(23, 20) === 4.U)) {
+    when(memAddressReg(4, 2) === 0.U) { cpu.io.dmem.rdData := pwmEnable }
+    for (i <- 0 until 7) {
+      when(memAddressReg(4, 2) === (i + 1).U) { cpu.io.dmem.rdData := pwmDutyRegs(i) }
+    }
   }
 }
 
