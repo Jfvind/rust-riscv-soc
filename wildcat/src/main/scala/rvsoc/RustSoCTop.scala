@@ -164,11 +164,11 @@ class RustSoCTop(frequ: Int = 100000000, baudRate: Int = 115200, memBytes: Int =
 
   // ---- PWM Controller ----
   val pwm = withReset(combinedReset) { Module(new PwmController()) }
-  val pwmEnable = withReset(combinedReset) { RegInit(0.U(7.W)) } // Bitmask to enable pwm signal for respective LED
-  val pwmDutyRegs = withReset(combinedReset) { RegInit(VecInit(Seq.fill(7)(0.U(8.W)))) } // Registers that holds respective duty cycle value for comparison in PWM module to control perceived brightness
+  val pwmEnable = withReset(combinedReset) { RegInit(0.U(16.W)) } // Bitmask to enable pwm signal for respective LED
+  val pwmDutyRegs = withReset(combinedReset) { RegInit(VecInit(Seq.fill(16)(0.U(8.W)))) } // Registers that holds respective duty cycle value for comparison in PWM module to control perceived brightness
 
   // Connect duty registers to PWM module
-  for (i <- 0 until 7) {
+  for (i <- 0 until 16) {
     pwm.io.duty(i) := pwmDutyRegs(i)
   }
 
@@ -212,12 +212,12 @@ class RustSoCTop(frequ: Int = 100000000, baudRate: Int = 115200, memBytes: Int =
       ledReg := cpu.io.dmem.wrData(15, 0)
     }.elsewhen (cpu.io.dmem.address(23, 20) === 4.U) {
       // PWMregisters: offset 0x00 = enable, 0x04-01C = duty cycle ch 0 - 6
-      when (cpu.io.dmem.adress(4, 2) === 0.U) {
-        pwmEnable := cpu.io.dmem.wrData(6,0)
+      when (cpu.io.dmem.adress(6, 2) === 0.U) {
+        pwmEnable := cpu.io.dmem.wrData(15,0)
       }
-      for (i <- 0 until 7) {
-        when (cpu.io.dmem.address(4, 2) === (i + 1).U) {
-          pwmDutyRegs(i) := cpu.io.dmem.wrData(7,0)
+      for (i <- 0 until 16) {
+        when (cpu.io.dmem.address(6, 2) === (i + 1).U) {
+          pwmDutyRegs(i) := cpu.io.dmem.wrData(7, 0)
         }
       }
     }
@@ -229,11 +229,12 @@ class RustSoCTop(frequ: Int = 100000000, baudRate: Int = 115200, memBytes: Int =
   io.led := RegNext(ledReg(15, 8)) ## cpuRunning ## RegNext(ledReg(6, 0))
 
   // Mux between direct LED register and PWM output per channel
-  val onboardBits = wire(Vec(7, Bool()))
-  for (i <- 0 until 7) {
-    onboardBits(i) := Mux(pwmEnable(i), pwm.io.pwmOut(i), ledReg(i))
+  val pwmLedBits = Wire(Vec(16, Bool()))
+  for (i <- 0 until 16) {
+    pwmLedBits(i) := Mux(pwmEnable(i), pwm.io.pwmOut(i), ledReg(i))
   }
-  io.led := RegNext(ledReg(15,8)) ## cpuRunning ## RegNext(onboardBits.asUint)
+  // Bit 7 is always cpuRunning, skip PWM for it
+  io.led := RegNext(pwmLedBits.asUInt(15, 8)) ## cpuRunning ## RegNext(pwmLedBits.asUInt(6, 0))
   
 
   // Buttons read at 0xF020_0000
@@ -251,9 +252,9 @@ class RustSoCTop(frequ: Int = 100000000, baudRate: Int = 115200, memBytes: Int =
 
   // PWM read at 0xF040_00X
   when(cpuRunning && (memAddressReg(31,28) === 0xf.U) && (memAddressReg(23, 20) === 4.U)) {
-    when(memAddressReg(4, 2) === 0.U) { cpu.io.dmem.rdData := pwmEnable }
-    for (i <- 0 until 7) {
-      when(memAddressReg(4, 2) === (i + 1).U) { cpu.io.dmem.rdData := pwmDutyRegs(i) }
+    when(memAddressReg(6, 2) === 0.U) { cpu.io.dmem.rdData := pwmEnable }
+    for (i <- 0 until 16) {
+      when(memAddressReg(6, 2) === (i + 1).U) { cpu.io.dmem.rdData := pwmDutyRegs(i) }
     }
   }
 }

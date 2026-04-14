@@ -14,7 +14,7 @@ import chisel3.util._
 |* @param channels number of independents PWM outputs (deafault 7 for LED 0 - 6)
 */
 
-class PwmController (channels: Int = 7) extends Module {
+class PwmController (channels: Int = 16) extends Module {
     val io = IO(new Bundle {
         val duty    = Input(Vec(channels, UInt(8.W))) // Each channel has 8-bit wide registers, for 8-bit (256 step) pwm-control resolution
         val pwmOut = Output(UInt(Channels.W)) // One concuted "channel" bit wide signal
