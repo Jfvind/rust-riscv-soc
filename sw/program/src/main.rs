@@ -154,6 +154,7 @@ fn main() {
     // Simple PWM fade state for RGB test.
     let mut fade: u8 = 0;
     let mut fade_up = true;
+    let mut color_phase: u8 = 0; // 0 = red, 1 = green, 2 = blue
 
     loop {
         // 1) Read peripherals
@@ -178,8 +179,12 @@ fn main() {
         led_write(adc_leds | btn_leds);
 
         // 5) RGB PWM fade test on io_led[12..14].
-        // R fades up while B fades down, G runs at half intensity.
-        rgb_set(fade, fade / 2, 100 - fade);
+        // Fade red, then green, then blue, one channel at a time.
+        match color_phase {
+            0 => rgb_set(fade, 0, 0),
+            1 => rgb_set(0, fade, 0),
+            _ => rgb_set(0, 0, fade),
+        }
 
         if fade_up {
             if fade >= 100 {
@@ -187,10 +192,13 @@ fn main() {
             } else {
                 fade += 1;
             }
-        } else if fade == 0 {
-            fade_up = true;
         } else {
-            fade -= 1;
+            if fade == 0 {
+                fade_up = true;
+                color_phase = (color_phase + 1) % 3;
+            } else {
+                fade -= 1;
+            }
         }
 
         // 6) Small delay to set animation speed.
