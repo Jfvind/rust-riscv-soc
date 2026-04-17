@@ -1448,6 +1448,104 @@ end // initial
 `endif
 `endif // SYNTHESIS
 endmodule
+module PwmController(
+  input         clock,
+  input         reset,
+  input  [7:0]  io_duty_0, // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 18:16]
+  input  [7:0]  io_duty_1, // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 18:16]
+  input  [7:0]  io_duty_2, // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 18:16]
+  input  [7:0]  io_duty_3, // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 18:16]
+  input  [7:0]  io_duty_4, // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 18:16]
+  input  [7:0]  io_duty_5, // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 18:16]
+  input  [7:0]  io_duty_6, // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 18:16]
+  input  [7:0]  io_duty_7, // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 18:16]
+  input  [7:0]  io_duty_8, // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 18:16]
+  input  [7:0]  io_duty_9, // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 18:16]
+  input  [7:0]  io_duty_10, // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 18:16]
+  input  [7:0]  io_duty_11, // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 18:16]
+  input  [7:0]  io_duty_12, // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 18:16]
+  input  [7:0]  io_duty_13, // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 18:16]
+  input  [7:0]  io_duty_14, // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 18:16]
+  input  [7:0]  io_duty_15, // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 18:16]
+  output [15:0] io_pwmOut // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 18:16]
+);
+`ifdef RANDOMIZE_REG_INIT
+  reg [31:0] _RAND_0;
+`endif // RANDOMIZE_REG_INIT
+  reg [7:0] counter; // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 24:26]
+  wire [7:0] _counter_T_1 = counter + 8'h1; // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 25:24]
+  wire  pwmBits_0 = counter < io_duty_0; // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 30:31]
+  wire  pwmBits_1 = counter < io_duty_1; // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 30:31]
+  wire  pwmBits_2 = counter < io_duty_2; // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 30:31]
+  wire  pwmBits_3 = counter < io_duty_3; // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 30:31]
+  wire  pwmBits_4 = counter < io_duty_4; // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 30:31]
+  wire  pwmBits_5 = counter < io_duty_5; // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 30:31]
+  wire  pwmBits_6 = counter < io_duty_6; // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 30:31]
+  wire  pwmBits_7 = counter < io_duty_7; // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 30:31]
+  wire  pwmBits_8 = counter < io_duty_8; // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 30:31]
+  wire  pwmBits_9 = counter < io_duty_9; // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 30:31]
+  wire  pwmBits_10 = counter < io_duty_10; // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 30:31]
+  wire  pwmBits_11 = counter < io_duty_11; // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 30:31]
+  wire  pwmBits_12 = counter < io_duty_12; // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 30:31]
+  wire  pwmBits_13 = counter < io_duty_13; // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 30:31]
+  wire  pwmBits_14 = counter < io_duty_14; // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 30:31]
+  wire  pwmBits_15 = counter < io_duty_15; // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 30:31]
+  wire [7:0] io_pwmOut_lo = {pwmBits_7,pwmBits_6,pwmBits_5,pwmBits_4,pwmBits_3,pwmBits_2,pwmBits_1,pwmBits_0}; // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 33:26]
+  wire [7:0] io_pwmOut_hi = {pwmBits_15,pwmBits_14,pwmBits_13,pwmBits_12,pwmBits_11,pwmBits_10,pwmBits_9,pwmBits_8}; // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 33:26]
+  assign io_pwmOut = {io_pwmOut_hi,io_pwmOut_lo}; // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 33:26]
+  always @(posedge clock) begin
+    if (reset) begin // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 24:26]
+      counter <= 8'h0; // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 24:26]
+    end else begin
+      counter <= _counter_T_1; // @[\\src\\main\\scala\\rvsoc\\PwmController.scala 25:13]
+    end
+  end
+// Register and memory initialization
+`ifdef RANDOMIZE_GARBAGE_ASSIGN
+`define RANDOMIZE
+`endif
+`ifdef RANDOMIZE_INVALID_ASSIGN
+`define RANDOMIZE
+`endif
+`ifdef RANDOMIZE_REG_INIT
+`define RANDOMIZE
+`endif
+`ifdef RANDOMIZE_MEM_INIT
+`define RANDOMIZE
+`endif
+`ifndef RANDOM
+`define RANDOM $random
+`endif
+`ifdef RANDOMIZE_MEM_INIT
+  integer initvar;
+`endif
+`ifndef SYNTHESIS
+`ifdef FIRRTL_BEFORE_INITIAL
+`FIRRTL_BEFORE_INITIAL
+`endif
+initial begin
+  `ifdef RANDOMIZE
+    `ifdef INIT_RANDOM
+      `INIT_RANDOM
+    `endif
+    `ifndef VERILATOR
+      `ifdef RANDOMIZE_DELAY
+        #`RANDOMIZE_DELAY begin end
+      `else
+        #0.002 begin end
+      `endif
+    `endif
+`ifdef RANDOMIZE_REG_INIT
+  _RAND_0 = {1{`RANDOM}};
+  counter = _RAND_0[7:0];
+`endif // RANDOMIZE_REG_INIT
+  `endif // RANDOMIZE
+end // initial
+`ifdef FIRRTL_AFTER_INITIAL
+`FIRRTL_AFTER_INITIAL
+`endif
+`endif // SYNTHESIS
+endmodule
 module Tx(
   input        clock,
   input        reset,
@@ -1712,6 +1810,23 @@ module RustSoCTop(
   reg [31:0] _RAND_4;
   reg [31:0] _RAND_5;
   reg [31:0] _RAND_6;
+  reg [31:0] _RAND_7;
+  reg [31:0] _RAND_8;
+  reg [31:0] _RAND_9;
+  reg [31:0] _RAND_10;
+  reg [31:0] _RAND_11;
+  reg [31:0] _RAND_12;
+  reg [31:0] _RAND_13;
+  reg [31:0] _RAND_14;
+  reg [31:0] _RAND_15;
+  reg [31:0] _RAND_16;
+  reg [31:0] _RAND_17;
+  reg [31:0] _RAND_18;
+  reg [31:0] _RAND_19;
+  reg [31:0] _RAND_20;
+  reg [31:0] _RAND_21;
+  reg [31:0] _RAND_22;
+  reg [31:0] _RAND_23;
 `endif // RANDOMIZE_REG_INIT
   wire  resetRx_clock; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 72:23]
   wire  resetRx_reset; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 72:23]
@@ -1754,32 +1869,51 @@ module RustSoCTop(
   wire [31:0] dmem_io_wrData; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 117:20]
   wire [3:0] dmem_io_wrMask; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 117:20]
   wire  dmem_io_ack; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 117:20]
-  wire  adc_clock; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 154:46]
-  wire  adc_reset; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 154:46]
-  wire  adc_io_vauxp6; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 154:46]
-  wire  adc_io_vauxn6; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 154:46]
-  wire  adc_io_vauxp14; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 154:46]
-  wire  adc_io_vauxn14; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 154:46]
-  wire  adc_io_vauxp7; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 154:46]
-  wire  adc_io_vauxn7; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 154:46]
-  wire  adc_io_vauxp15; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 154:46]
-  wire  adc_io_vauxn15; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 154:46]
-  wire [15:0] adc_io_adcData0; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 154:46]
-  wire [15:0] adc_io_adcData1; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 154:46]
-  wire [15:0] adc_io_adcData2; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 154:46]
-  wire [15:0] adc_io_adcData3; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 154:46]
-  wire  uartTx_clock; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 166:49]
-  wire  uartTx_reset; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 166:49]
-  wire  uartTx_io_txd; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 166:49]
-  wire  uartTx_io_channel_ready; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 166:49]
-  wire  uartTx_io_channel_valid; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 166:49]
-  wire [7:0] uartTx_io_channel_bits; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 166:49]
-  wire  uartRx_clock; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 167:49]
-  wire  uartRx_reset; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 167:49]
-  wire  uartRx_io_rxd; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 167:49]
-  wire  uartRx_io_channel_ready; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 167:49]
-  wire  uartRx_io_channel_valid; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 167:49]
-  wire [7:0] uartRx_io_channel_bits; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 167:49]
+  wire  adc_clock; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 155:46]
+  wire  adc_reset; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 155:46]
+  wire  adc_io_vauxp6; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 155:46]
+  wire  adc_io_vauxn6; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 155:46]
+  wire  adc_io_vauxp14; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 155:46]
+  wire  adc_io_vauxn14; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 155:46]
+  wire  adc_io_vauxp7; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 155:46]
+  wire  adc_io_vauxn7; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 155:46]
+  wire  adc_io_vauxp15; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 155:46]
+  wire  adc_io_vauxn15; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 155:46]
+  wire [15:0] adc_io_adcData0; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 155:46]
+  wire [15:0] adc_io_adcData1; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 155:46]
+  wire [15:0] adc_io_adcData2; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 155:46]
+  wire [15:0] adc_io_adcData3; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 155:46]
+  wire  pwm_clock; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 166:46]
+  wire  pwm_reset; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 166:46]
+  wire [7:0] pwm_io_duty_0; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 166:46]
+  wire [7:0] pwm_io_duty_1; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 166:46]
+  wire [7:0] pwm_io_duty_2; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 166:46]
+  wire [7:0] pwm_io_duty_3; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 166:46]
+  wire [7:0] pwm_io_duty_4; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 166:46]
+  wire [7:0] pwm_io_duty_5; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 166:46]
+  wire [7:0] pwm_io_duty_6; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 166:46]
+  wire [7:0] pwm_io_duty_7; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 166:46]
+  wire [7:0] pwm_io_duty_8; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 166:46]
+  wire [7:0] pwm_io_duty_9; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 166:46]
+  wire [7:0] pwm_io_duty_10; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 166:46]
+  wire [7:0] pwm_io_duty_11; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 166:46]
+  wire [7:0] pwm_io_duty_12; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 166:46]
+  wire [7:0] pwm_io_duty_13; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 166:46]
+  wire [7:0] pwm_io_duty_14; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 166:46]
+  wire [7:0] pwm_io_duty_15; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 166:46]
+  wire [15:0] pwm_io_pwmOut; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 166:46]
+  wire  uartTx_clock; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 177:49]
+  wire  uartTx_reset; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 177:49]
+  wire  uartTx_io_txd; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 177:49]
+  wire  uartTx_io_channel_ready; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 177:49]
+  wire  uartTx_io_channel_valid; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 177:49]
+  wire [7:0] uartTx_io_channel_bits; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 177:49]
+  wire  uartRx_clock; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 178:49]
+  wire  uartRx_reset; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 178:49]
+  wire  uartRx_io_rxd; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 178:49]
+  wire  uartRx_io_channel_ready; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 178:49]
+  wire  uartRx_io_channel_valid; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 178:49]
+  wire [7:0] uartRx_io_channel_bits; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 178:49]
   reg [31:0] resetShift; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 76:27]
   wire [31:0] _resetShift_T_1 = {resetRx_io_channel_bits,resetShift[31:8]}; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 78:43]
   wire  softReset = resetShift == 32'hdeadbeef; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 82:19]
@@ -1790,26 +1924,115 @@ module RustSoCTop(
   wire  _GEN_3 = ~cpuRunning & bootloader_io_wrEnabled & bootloader_io_instrData == 32'hd0000000 | cpuRunning; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 102:97 103:16 92:54]
   wire  _GEN_10 = _T_3 & bootloader_io_instrData != 32'hd0000000 | cpu_io_dmem_wr; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 122:15 128:97 138:21]
   wire [31:0] _GEN_16 = _T_1 ? 32'h0 : dmem_io_rdData; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 122:15 147:21 150:24]
-  reg [1:0] uartStatusReg; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 180:30]
-  reg [31:0] memAddressReg; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 181:30]
-  wire  _T_14 = cpuRunning & memAddressReg[31:28] == 4'hf; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 184:19]
-  wire  _T_19 = memAddressReg[3:0] == 4'h0; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 185:30]
-  wire  _T_21 = memAddressReg[3:0] == 4'h4; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 187:36]
-  wire [31:0] _GEN_18 = memAddressReg[3:0] == 4'h4 ? {{24'd0}, uartRx_io_channel_bits} : _GEN_16; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 187:45 188:26]
-  wire  _GEN_19 = memAddressReg[3:0] == 4'h4 & cpu_io_dmem_rd; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 177:27 187:45 189:31]
-  wire [31:0] _GEN_20 = memAddressReg[3:0] == 4'h0 ? {{30'd0}, uartStatusReg} : _GEN_18; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 185:39 186:26]
-  wire  _GEN_21 = memAddressReg[3:0] == 4'h0 ? 1'h0 : _GEN_19; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 177:27 185:39]
-  wire [31:0] _GEN_22 = cpuRunning & memAddressReg[31:28] == 4'hf & memAddressReg[23:20] == 4'h0 ? _GEN_20 : _GEN_16; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 184:88]
-  reg [15:0] ledReg; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 194:50]
-  wire  _T_30 = cpu_io_dmem_address[23:20] == 4'h0 & cpu_io_dmem_address[3:0] == 4'h4; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 196:46]
-  reg [7:0] io_led_REG; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 208:20]
-  wire [8:0] _io_led_T_1 = {io_led_REG,cpuRunning}; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 208:36]
-  reg [6:0] io_led_REG_1; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 208:60]
-  wire [31:0] _GEN_30 = _T_14 & memAddressReg[23:20] == 4'h2 ? {{28'd0}, io_btn} : _GEN_22; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 211:90 212:24]
-  wire [31:0] _GEN_31 = memAddressReg[3:0] == 4'hc ? {{16'd0}, adc_io_adcData3} : _GEN_30; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 220:{45,66}]
-  wire [31:0] _GEN_32 = memAddressReg[3:0] == 4'h8 ? {{16'd0}, adc_io_adcData2} : _GEN_31; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 219:{45,66}]
-  wire [31:0] _GEN_33 = _T_21 ? {{16'd0}, adc_io_adcData1} : _GEN_32; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 218:{45,66}]
-  wire [31:0] _GEN_34 = _T_19 ? {{16'd0}, adc_io_adcData0} : _GEN_33; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 217:{45,66}]
+  reg [15:0] pwmEnable; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 167:53]
+  reg [7:0] pwmDutyRegs_0; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+  reg [7:0] pwmDutyRegs_1; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+  reg [7:0] pwmDutyRegs_2; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+  reg [7:0] pwmDutyRegs_3; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+  reg [7:0] pwmDutyRegs_4; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+  reg [7:0] pwmDutyRegs_5; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+  reg [7:0] pwmDutyRegs_6; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+  reg [7:0] pwmDutyRegs_7; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+  reg [7:0] pwmDutyRegs_8; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+  reg [7:0] pwmDutyRegs_9; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+  reg [7:0] pwmDutyRegs_10; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+  reg [7:0] pwmDutyRegs_11; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+  reg [7:0] pwmDutyRegs_12; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+  reg [7:0] pwmDutyRegs_13; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+  reg [7:0] pwmDutyRegs_14; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+  reg [7:0] pwmDutyRegs_15; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+  reg [1:0] uartStatusReg; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 191:30]
+  reg [31:0] memAddressReg; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 192:30]
+  wire  _T_14 = cpuRunning & memAddressReg[31:28] == 4'hf; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 195:19]
+  wire  _T_19 = memAddressReg[3:0] == 4'h0; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 196:30]
+  wire  _T_21 = memAddressReg[3:0] == 4'h4; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 198:36]
+  wire [31:0] _GEN_18 = memAddressReg[3:0] == 4'h4 ? {{24'd0}, uartRx_io_channel_bits} : _GEN_16; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 198:45 199:26]
+  wire  _GEN_19 = memAddressReg[3:0] == 4'h4 & cpu_io_dmem_rd; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 188:27 198:45 200:31]
+  wire [31:0] _GEN_20 = memAddressReg[3:0] == 4'h0 ? {{30'd0}, uartStatusReg} : _GEN_18; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 196:39 197:26]
+  wire  _GEN_21 = memAddressReg[3:0] == 4'h0 ? 1'h0 : _GEN_19; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 188:27 196:39]
+  wire [31:0] _GEN_22 = cpuRunning & memAddressReg[31:28] == 4'hf & memAddressReg[23:20] == 4'h0 ? _GEN_20 : _GEN_16; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 195:88]
+  reg [15:0] ledReg; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 205:50]
+  wire  _T_30 = cpu_io_dmem_address[23:20] == 4'h0 & cpu_io_dmem_address[3:0] == 4'h4; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 207:46]
+  wire [15:0] _GEN_24 = cpu_io_dmem_address[6:2] == 5'h0 ? cpu_io_dmem_wrData[15:0] : pwmEnable; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 215:48 216:19 167:53]
+  wire [7:0] _GEN_25 = cpu_io_dmem_address[6:2] == 5'h1 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_0; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 219:56 220:26 168:55]
+  wire [7:0] _GEN_26 = cpu_io_dmem_address[6:2] == 5'h2 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_1; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 219:56 220:26 168:55]
+  wire [7:0] _GEN_27 = cpu_io_dmem_address[6:2] == 5'h3 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_2; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 219:56 220:26 168:55]
+  wire [7:0] _GEN_28 = cpu_io_dmem_address[6:2] == 5'h4 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_3; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 219:56 220:26 168:55]
+  wire [7:0] _GEN_29 = cpu_io_dmem_address[6:2] == 5'h5 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_4; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 219:56 220:26 168:55]
+  wire [7:0] _GEN_30 = cpu_io_dmem_address[6:2] == 5'h6 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_5; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 219:56 220:26 168:55]
+  wire [7:0] _GEN_31 = cpu_io_dmem_address[6:2] == 5'h7 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_6; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 219:56 220:26 168:55]
+  wire [7:0] _GEN_32 = cpu_io_dmem_address[6:2] == 5'h8 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_7; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 219:56 220:26 168:55]
+  wire [7:0] _GEN_33 = cpu_io_dmem_address[6:2] == 5'h9 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_8; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 219:56 220:26 168:55]
+  wire [7:0] _GEN_34 = cpu_io_dmem_address[6:2] == 5'ha ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_9; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 219:56 220:26 168:55]
+  wire [7:0] _GEN_35 = cpu_io_dmem_address[6:2] == 5'hb ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_10; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 219:56 220:26 168:55]
+  wire [7:0] _GEN_36 = cpu_io_dmem_address[6:2] == 5'hc ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_11; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 219:56 220:26 168:55]
+  wire [7:0] _GEN_37 = cpu_io_dmem_address[6:2] == 5'hd ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_12; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 219:56 220:26 168:55]
+  wire [7:0] _GEN_38 = cpu_io_dmem_address[6:2] == 5'he ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_13; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 219:56 220:26 168:55]
+  wire [7:0] _GEN_39 = cpu_io_dmem_address[6:2] == 5'hf ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_14; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 219:56 220:26 168:55]
+  wire [7:0] _GEN_40 = cpu_io_dmem_address[6:2] == 5'h10 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_15; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 219:56 220:26 168:55]
+  wire [15:0] _GEN_41 = cpu_io_dmem_address[23:20] == 4'h4 ? _GEN_24 : pwmEnable; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 167:53 213:54]
+  wire [7:0] _GEN_42 = cpu_io_dmem_address[23:20] == 4'h4 ? _GEN_25 : pwmDutyRegs_0; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 213:54 168:55]
+  wire [7:0] _GEN_43 = cpu_io_dmem_address[23:20] == 4'h4 ? _GEN_26 : pwmDutyRegs_1; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 213:54 168:55]
+  wire [7:0] _GEN_44 = cpu_io_dmem_address[23:20] == 4'h4 ? _GEN_27 : pwmDutyRegs_2; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 213:54 168:55]
+  wire [7:0] _GEN_45 = cpu_io_dmem_address[23:20] == 4'h4 ? _GEN_28 : pwmDutyRegs_3; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 213:54 168:55]
+  wire [7:0] _GEN_46 = cpu_io_dmem_address[23:20] == 4'h4 ? _GEN_29 : pwmDutyRegs_4; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 213:54 168:55]
+  wire [7:0] _GEN_47 = cpu_io_dmem_address[23:20] == 4'h4 ? _GEN_30 : pwmDutyRegs_5; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 213:54 168:55]
+  wire [7:0] _GEN_48 = cpu_io_dmem_address[23:20] == 4'h4 ? _GEN_31 : pwmDutyRegs_6; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 213:54 168:55]
+  wire [7:0] _GEN_49 = cpu_io_dmem_address[23:20] == 4'h4 ? _GEN_32 : pwmDutyRegs_7; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 213:54 168:55]
+  wire [7:0] _GEN_50 = cpu_io_dmem_address[23:20] == 4'h4 ? _GEN_33 : pwmDutyRegs_8; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 213:54 168:55]
+  wire [7:0] _GEN_51 = cpu_io_dmem_address[23:20] == 4'h4 ? _GEN_34 : pwmDutyRegs_9; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 213:54 168:55]
+  wire [7:0] _GEN_52 = cpu_io_dmem_address[23:20] == 4'h4 ? _GEN_35 : pwmDutyRegs_10; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 213:54 168:55]
+  wire [7:0] _GEN_53 = cpu_io_dmem_address[23:20] == 4'h4 ? _GEN_36 : pwmDutyRegs_11; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 213:54 168:55]
+  wire [7:0] _GEN_54 = cpu_io_dmem_address[23:20] == 4'h4 ? _GEN_37 : pwmDutyRegs_12; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 213:54 168:55]
+  wire [7:0] _GEN_55 = cpu_io_dmem_address[23:20] == 4'h4 ? _GEN_38 : pwmDutyRegs_13; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 213:54 168:55]
+  wire [7:0] _GEN_56 = cpu_io_dmem_address[23:20] == 4'h4 ? _GEN_39 : pwmDutyRegs_14; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 213:54 168:55]
+  wire [7:0] _GEN_57 = cpu_io_dmem_address[23:20] == 4'h4 ? _GEN_40 : pwmDutyRegs_15; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 213:54 168:55]
+  wire  pwmLedBits_0 = pwmEnable[0] ? pwm_io_pwmOut[0] : ledReg[0]; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 231:25]
+  wire  pwmLedBits_1 = pwmEnable[1] ? pwm_io_pwmOut[1] : ledReg[1]; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 231:25]
+  wire  pwmLedBits_2 = pwmEnable[2] ? pwm_io_pwmOut[2] : ledReg[2]; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 231:25]
+  wire  pwmLedBits_3 = pwmEnable[3] ? pwm_io_pwmOut[3] : ledReg[3]; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 231:25]
+  wire  pwmLedBits_4 = pwmEnable[4] ? pwm_io_pwmOut[4] : ledReg[4]; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 231:25]
+  wire  pwmLedBits_5 = pwmEnable[5] ? pwm_io_pwmOut[5] : ledReg[5]; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 231:25]
+  wire  pwmLedBits_6 = pwmEnable[6] ? pwm_io_pwmOut[6] : ledReg[6]; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 231:25]
+  wire  pwmLedBits_7 = pwmEnable[7] ? pwm_io_pwmOut[7] : ledReg[7]; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 231:25]
+  wire  pwmLedBits_8 = pwmEnable[8] ? pwm_io_pwmOut[8] : ledReg[8]; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 231:25]
+  wire  pwmLedBits_9 = pwmEnable[9] ? pwm_io_pwmOut[9] : ledReg[9]; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 231:25]
+  wire  pwmLedBits_10 = pwmEnable[10] ? pwm_io_pwmOut[10] : ledReg[10]; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 231:25]
+  wire  pwmLedBits_11 = pwmEnable[11] ? pwm_io_pwmOut[11] : ledReg[11]; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 231:25]
+  wire  pwmLedBits_12 = pwmEnable[12] ? pwm_io_pwmOut[12] : ledReg[12]; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 231:25]
+  wire  pwmLedBits_13 = pwmEnable[13] ? pwm_io_pwmOut[13] : ledReg[13]; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 231:25]
+  wire  pwmLedBits_14 = pwmEnable[14] ? pwm_io_pwmOut[14] : ledReg[14]; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 231:25]
+  wire  pwmLedBits_15 = pwmEnable[15] ? pwm_io_pwmOut[15] : ledReg[15]; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 231:25]
+  wire [7:0] io_led_lo = {pwmLedBits_7,pwmLedBits_6,pwmLedBits_5,pwmLedBits_4,pwmLedBits_3,pwmLedBits_2,pwmLedBits_1,
+    pwmLedBits_0}; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 234:32]
+  wire [15:0] _io_led_T = {pwmLedBits_15,pwmLedBits_14,pwmLedBits_13,pwmLedBits_12,pwmLedBits_11,pwmLedBits_10,
+    pwmLedBits_9,pwmLedBits_8,io_led_lo}; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 234:32]
+  reg [7:0] io_led_REG; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 234:20]
+  wire [8:0] _io_led_T_2 = {io_led_REG,cpuRunning}; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 234:47]
+  reg [6:0] io_led_REG_1; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 234:71]
+  wire [31:0] _GEN_115 = _T_14 & memAddressReg[23:20] == 4'h2 ? {{28'd0}, io_btn} : _GEN_22; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 238:90 239:24]
+  wire [31:0] _GEN_116 = memAddressReg[3:0] == 4'hc ? {{16'd0}, adc_io_adcData3} : _GEN_115; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 247:{45,66}]
+  wire [31:0] _GEN_117 = memAddressReg[3:0] == 4'h8 ? {{16'd0}, adc_io_adcData2} : _GEN_116; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 246:{45,66}]
+  wire [31:0] _GEN_118 = _T_21 ? {{16'd0}, adc_io_adcData1} : _GEN_117; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 245:{45,66}]
+  wire [31:0] _GEN_119 = _T_19 ? {{16'd0}, adc_io_adcData0} : _GEN_118; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 244:{45,66}]
+  wire [31:0] _GEN_120 = _T_14 & memAddressReg[23:20] == 4'h3 ? _GEN_119 : _GEN_115; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 243:92]
+  wire [31:0] _GEN_121 = memAddressReg[6:2] == 5'h0 ? {{16'd0}, pwmEnable} : _GEN_120; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 252:{39,60}]
+  wire [31:0] _GEN_122 = memAddressReg[6:2] == 5'h1 ? {{24'd0}, pwmDutyRegs_0} : _GEN_121; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 254:{47,68}]
+  wire [31:0] _GEN_123 = memAddressReg[6:2] == 5'h2 ? {{24'd0}, pwmDutyRegs_1} : _GEN_122; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 254:{47,68}]
+  wire [31:0] _GEN_124 = memAddressReg[6:2] == 5'h3 ? {{24'd0}, pwmDutyRegs_2} : _GEN_123; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 254:{47,68}]
+  wire [31:0] _GEN_125 = memAddressReg[6:2] == 5'h4 ? {{24'd0}, pwmDutyRegs_3} : _GEN_124; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 254:{47,68}]
+  wire [31:0] _GEN_126 = memAddressReg[6:2] == 5'h5 ? {{24'd0}, pwmDutyRegs_4} : _GEN_125; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 254:{47,68}]
+  wire [31:0] _GEN_127 = memAddressReg[6:2] == 5'h6 ? {{24'd0}, pwmDutyRegs_5} : _GEN_126; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 254:{47,68}]
+  wire [31:0] _GEN_128 = memAddressReg[6:2] == 5'h7 ? {{24'd0}, pwmDutyRegs_6} : _GEN_127; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 254:{47,68}]
+  wire [31:0] _GEN_129 = memAddressReg[6:2] == 5'h8 ? {{24'd0}, pwmDutyRegs_7} : _GEN_128; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 254:{47,68}]
+  wire [31:0] _GEN_130 = memAddressReg[6:2] == 5'h9 ? {{24'd0}, pwmDutyRegs_8} : _GEN_129; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 254:{47,68}]
+  wire [31:0] _GEN_131 = memAddressReg[6:2] == 5'ha ? {{24'd0}, pwmDutyRegs_9} : _GEN_130; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 254:{47,68}]
+  wire [31:0] _GEN_132 = memAddressReg[6:2] == 5'hb ? {{24'd0}, pwmDutyRegs_10} : _GEN_131; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 254:{47,68}]
+  wire [31:0] _GEN_133 = memAddressReg[6:2] == 5'hc ? {{24'd0}, pwmDutyRegs_11} : _GEN_132; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 254:{47,68}]
+  wire [31:0] _GEN_134 = memAddressReg[6:2] == 5'hd ? {{24'd0}, pwmDutyRegs_12} : _GEN_133; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 254:{47,68}]
+  wire [31:0] _GEN_135 = memAddressReg[6:2] == 5'he ? {{24'd0}, pwmDutyRegs_13} : _GEN_134; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 254:{47,68}]
+  wire [31:0] _GEN_136 = memAddressReg[6:2] == 5'hf ? {{24'd0}, pwmDutyRegs_14} : _GEN_135; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 254:{47,68}]
+  wire [31:0] _GEN_137 = memAddressReg[6:2] == 5'h10 ? {{24'd0}, pwmDutyRegs_15} : _GEN_136; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 254:{47,68}]
   Rx resetRx ( // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 72:23]
     .clock(resetRx_clock),
     .reset(resetRx_reset),
@@ -1861,7 +2084,7 @@ module RustSoCTop(
     .io_wrMask(dmem_io_wrMask),
     .io_ack(dmem_io_ack)
   );
-  AdcController adc ( // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 154:46]
+  AdcController adc ( // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 155:46]
     .clock(adc_clock),
     .reset(adc_reset),
     .io_vauxp6(adc_io_vauxp6),
@@ -1877,7 +2100,28 @@ module RustSoCTop(
     .io_adcData2(adc_io_adcData2),
     .io_adcData3(adc_io_adcData3)
   );
-  BufferedTx uartTx ( // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 166:49]
+  PwmController pwm ( // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 166:46]
+    .clock(pwm_clock),
+    .reset(pwm_reset),
+    .io_duty_0(pwm_io_duty_0),
+    .io_duty_1(pwm_io_duty_1),
+    .io_duty_2(pwm_io_duty_2),
+    .io_duty_3(pwm_io_duty_3),
+    .io_duty_4(pwm_io_duty_4),
+    .io_duty_5(pwm_io_duty_5),
+    .io_duty_6(pwm_io_duty_6),
+    .io_duty_7(pwm_io_duty_7),
+    .io_duty_8(pwm_io_duty_8),
+    .io_duty_9(pwm_io_duty_9),
+    .io_duty_10(pwm_io_duty_10),
+    .io_duty_11(pwm_io_duty_11),
+    .io_duty_12(pwm_io_duty_12),
+    .io_duty_13(pwm_io_duty_13),
+    .io_duty_14(pwm_io_duty_14),
+    .io_duty_15(pwm_io_duty_15),
+    .io_pwmOut(pwm_io_pwmOut)
+  );
+  BufferedTx uartTx ( // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 177:49]
     .clock(uartTx_clock),
     .reset(uartTx_reset),
     .io_txd(uartTx_io_txd),
@@ -1885,7 +2129,7 @@ module RustSoCTop(
     .io_channel_valid(uartTx_io_channel_valid),
     .io_channel_bits(uartTx_io_channel_bits)
   );
-  Rx uartRx ( // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 167:49]
+  Rx uartRx ( // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 178:49]
     .clock(uartRx_clock),
     .reset(uartRx_reset),
     .io_rxd(uartRx_io_rxd),
@@ -1893,8 +2137,8 @@ module RustSoCTop(
     .io_channel_valid(uartRx_io_channel_valid),
     .io_channel_bits(uartRx_io_channel_bits)
   );
-  assign io_led = {_io_led_T_1,io_led_REG_1}; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 208:50]
-  assign io_tx = cpuRunning ? uartTx_io_txd : 1'h1; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 170:15]
+  assign io_led = {_io_led_T_2,io_led_REG_1}; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 234:61]
+  assign io_tx = cpuRunning ? uartTx_io_txd : 1'h1; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 181:15]
   assign resetRx_clock = clock;
   assign resetRx_reset = reset;
   assign resetRx_io_rxd = io_rx; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 73:18]
@@ -1906,7 +2150,7 @@ module RustSoCTop(
   assign cpu_reset = reset | softReset; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 89:37]
   assign cpu_io_imem_rdData = _T_1 ? 32'h33 : imem_io_rdData; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 121:15 147:21 148:24]
   assign cpu_io_imem_ack = _T_1 ? 1'h0 : imem_io_ack; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 121:15 147:21 149:24]
-  assign cpu_io_dmem_rdData = _T_14 & memAddressReg[23:20] == 4'h3 ? _GEN_34 : _GEN_30; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 216:92]
+  assign cpu_io_dmem_rdData = _T_14 & memAddressReg[23:20] == 4'h4 ? _GEN_137 : _GEN_120; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 251:91]
   assign imem_clock = clock;
   assign imem_reset = reset;
   assign imem_io_address = _T_3 & bootloader_io_instrData != 32'hd0000000 ? bootloader_io_instrAddr :
@@ -1920,27 +2164,45 @@ module RustSoCTop(
   assign dmem_io_address = _T_3 & bootloader_io_instrData != 32'hd0000000 ? bootloader_io_instrAddr :
     cpu_io_dmem_address; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 122:15 128:97 137:21]
   assign dmem_io_rd = _T_3 & bootloader_io_instrData != 32'hd0000000 ? 1'h0 : cpu_io_dmem_rd; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 122:15 128:97 141:21]
-  assign dmem_io_wr = cpuRunning & cpu_io_dmem_address[31:28] == 4'hf & cpu_io_dmem_wr ? 1'h0 : _GEN_10; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 195:81 204:16]
+  assign dmem_io_wr = cpuRunning & cpu_io_dmem_address[31:28] == 4'hf & cpu_io_dmem_wr ? 1'h0 : _GEN_10; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 206:81 225:16]
   assign dmem_io_wrData = _T_3 & bootloader_io_instrData != 32'hd0000000 ? bootloader_io_instrData : cpu_io_dmem_wrData; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 122:15 128:97 139:21]
   assign dmem_io_wrMask = _T_3 & bootloader_io_instrData != 32'hd0000000 ? 4'hf : cpu_io_dmem_wrMask; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 122:15 128:97 140:21]
   assign adc_clock = clock;
   assign adc_reset = reset | softReset; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 89:37]
-  assign adc_io_vauxp6 = io_vauxp6; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 155:19]
-  assign adc_io_vauxn6 = io_vauxn6; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 156:19]
-  assign adc_io_vauxp14 = io_vauxp14; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 157:19]
-  assign adc_io_vauxn14 = io_vauxn14; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 158:19]
-  assign adc_io_vauxp7 = io_vauxp7; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 159:19]
-  assign adc_io_vauxn7 = io_vauxn7; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 160:19]
-  assign adc_io_vauxp15 = io_vauxp15; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 161:19]
-  assign adc_io_vauxn15 = io_vauxn15; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 162:19]
+  assign adc_io_vauxp6 = io_vauxp6; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 156:19]
+  assign adc_io_vauxn6 = io_vauxn6; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 157:19]
+  assign adc_io_vauxp14 = io_vauxp14; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 158:19]
+  assign adc_io_vauxn14 = io_vauxn14; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 159:19]
+  assign adc_io_vauxp7 = io_vauxp7; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 160:19]
+  assign adc_io_vauxn7 = io_vauxn7; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 161:19]
+  assign adc_io_vauxp15 = io_vauxp15; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 162:19]
+  assign adc_io_vauxn15 = io_vauxn15; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 163:19]
+  assign pwm_clock = clock;
+  assign pwm_reset = reset | softReset; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 89:37]
+  assign pwm_io_duty_0 = pwmDutyRegs_0; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 172:20]
+  assign pwm_io_duty_1 = pwmDutyRegs_1; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 172:20]
+  assign pwm_io_duty_2 = pwmDutyRegs_2; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 172:20]
+  assign pwm_io_duty_3 = pwmDutyRegs_3; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 172:20]
+  assign pwm_io_duty_4 = pwmDutyRegs_4; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 172:20]
+  assign pwm_io_duty_5 = pwmDutyRegs_5; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 172:20]
+  assign pwm_io_duty_6 = pwmDutyRegs_6; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 172:20]
+  assign pwm_io_duty_7 = pwmDutyRegs_7; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 172:20]
+  assign pwm_io_duty_8 = pwmDutyRegs_8; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 172:20]
+  assign pwm_io_duty_9 = pwmDutyRegs_9; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 172:20]
+  assign pwm_io_duty_10 = pwmDutyRegs_10; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 172:20]
+  assign pwm_io_duty_11 = pwmDutyRegs_11; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 172:20]
+  assign pwm_io_duty_12 = pwmDutyRegs_12; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 172:20]
+  assign pwm_io_duty_13 = pwmDutyRegs_13; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 172:20]
+  assign pwm_io_duty_14 = pwmDutyRegs_14; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 172:20]
+  assign pwm_io_duty_15 = pwmDutyRegs_15; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 172:20]
   assign uartTx_clock = clock;
   assign uartTx_reset = reset | softReset; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 89:37]
-  assign uartTx_io_channel_valid = cpuRunning & cpu_io_dmem_address[31:28] == 4'hf & cpu_io_dmem_wr & _T_30; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 176:27 195:81]
-  assign uartTx_io_channel_bits = cpu_io_dmem_wrData[7:0]; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 175:48]
+  assign uartTx_io_channel_valid = cpuRunning & cpu_io_dmem_address[31:28] == 4'hf & cpu_io_dmem_wr & _T_30; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 187:27 206:81]
+  assign uartTx_io_channel_bits = cpu_io_dmem_wrData[7:0]; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 186:48]
   assign uartRx_clock = clock;
   assign uartRx_reset = reset | softReset; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 89:37]
-  assign uartRx_io_rxd = cpuRunning ? io_rx : 1'h1; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 172:23]
-  assign uartRx_io_channel_ready = cpuRunning & memAddressReg[31:28] == 4'hf & memAddressReg[23:20] == 4'h0 & _GEN_21; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 177:27 184:88]
+  assign uartRx_io_rxd = cpuRunning ? io_rx : 1'h1; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 183:23]
+  assign uartRx_io_channel_ready = cpuRunning & memAddressReg[31:28] == 4'hf & memAddressReg[23:20] == 4'h0 & _GEN_21; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 188:27 195:88]
   always @(posedge clock) begin
     if (reset) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 76:27]
       resetShift <= 32'h0; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 76:27]
@@ -1954,19 +2216,172 @@ module RustSoCTop(
     end else begin
       cpuRunning <= _GEN_3;
     end
-    uartStatusReg <= {uartRx_io_channel_valid,uartTx_io_channel_ready}; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 180:55]
-    memAddressReg <= cpu_io_dmem_address; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 181:30]
-    if (combinedReset) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 194:50]
-      ledReg <= 16'h0; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 194:50]
-    end else if (cpuRunning & cpu_io_dmem_address[31:28] == 4'hf & cpu_io_dmem_wr) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 195:81]
-      if (!(cpu_io_dmem_address[23:20] == 4'h0 & cpu_io_dmem_address[3:0] == 4'h4)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 196:84]
-        if (cpu_io_dmem_address[23:20] == 4'h1) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 199:53]
-          ledReg <= cpu_io_dmem_wrData[15:0]; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 201:14]
+    if (combinedReset) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 167:53]
+      pwmEnable <= 16'h0; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 167:53]
+    end else if (cpuRunning & cpu_io_dmem_address[31:28] == 4'hf & cpu_io_dmem_wr) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 206:81]
+      if (!(cpu_io_dmem_address[23:20] == 4'h0 & cpu_io_dmem_address[3:0] == 4'h4)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 207:84]
+        if (!(cpu_io_dmem_address[23:20] == 4'h1)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 210:53]
+          pwmEnable <= _GEN_41;
         end
       end
     end
-    io_led_REG <= ledReg[15:8]; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 208:27]
-    io_led_REG_1 <= ledReg[6:0]; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 208:67]
+    if (combinedReset) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+      pwmDutyRegs_0 <= 8'h0; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+    end else if (cpuRunning & cpu_io_dmem_address[31:28] == 4'hf & cpu_io_dmem_wr) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 206:81]
+      if (!(cpu_io_dmem_address[23:20] == 4'h0 & cpu_io_dmem_address[3:0] == 4'h4)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 207:84]
+        if (!(cpu_io_dmem_address[23:20] == 4'h1)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 210:53]
+          pwmDutyRegs_0 <= _GEN_42;
+        end
+      end
+    end
+    if (combinedReset) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+      pwmDutyRegs_1 <= 8'h0; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+    end else if (cpuRunning & cpu_io_dmem_address[31:28] == 4'hf & cpu_io_dmem_wr) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 206:81]
+      if (!(cpu_io_dmem_address[23:20] == 4'h0 & cpu_io_dmem_address[3:0] == 4'h4)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 207:84]
+        if (!(cpu_io_dmem_address[23:20] == 4'h1)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 210:53]
+          pwmDutyRegs_1 <= _GEN_43;
+        end
+      end
+    end
+    if (combinedReset) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+      pwmDutyRegs_2 <= 8'h0; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+    end else if (cpuRunning & cpu_io_dmem_address[31:28] == 4'hf & cpu_io_dmem_wr) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 206:81]
+      if (!(cpu_io_dmem_address[23:20] == 4'h0 & cpu_io_dmem_address[3:0] == 4'h4)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 207:84]
+        if (!(cpu_io_dmem_address[23:20] == 4'h1)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 210:53]
+          pwmDutyRegs_2 <= _GEN_44;
+        end
+      end
+    end
+    if (combinedReset) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+      pwmDutyRegs_3 <= 8'h0; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+    end else if (cpuRunning & cpu_io_dmem_address[31:28] == 4'hf & cpu_io_dmem_wr) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 206:81]
+      if (!(cpu_io_dmem_address[23:20] == 4'h0 & cpu_io_dmem_address[3:0] == 4'h4)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 207:84]
+        if (!(cpu_io_dmem_address[23:20] == 4'h1)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 210:53]
+          pwmDutyRegs_3 <= _GEN_45;
+        end
+      end
+    end
+    if (combinedReset) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+      pwmDutyRegs_4 <= 8'h0; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+    end else if (cpuRunning & cpu_io_dmem_address[31:28] == 4'hf & cpu_io_dmem_wr) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 206:81]
+      if (!(cpu_io_dmem_address[23:20] == 4'h0 & cpu_io_dmem_address[3:0] == 4'h4)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 207:84]
+        if (!(cpu_io_dmem_address[23:20] == 4'h1)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 210:53]
+          pwmDutyRegs_4 <= _GEN_46;
+        end
+      end
+    end
+    if (combinedReset) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+      pwmDutyRegs_5 <= 8'h0; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+    end else if (cpuRunning & cpu_io_dmem_address[31:28] == 4'hf & cpu_io_dmem_wr) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 206:81]
+      if (!(cpu_io_dmem_address[23:20] == 4'h0 & cpu_io_dmem_address[3:0] == 4'h4)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 207:84]
+        if (!(cpu_io_dmem_address[23:20] == 4'h1)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 210:53]
+          pwmDutyRegs_5 <= _GEN_47;
+        end
+      end
+    end
+    if (combinedReset) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+      pwmDutyRegs_6 <= 8'h0; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+    end else if (cpuRunning & cpu_io_dmem_address[31:28] == 4'hf & cpu_io_dmem_wr) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 206:81]
+      if (!(cpu_io_dmem_address[23:20] == 4'h0 & cpu_io_dmem_address[3:0] == 4'h4)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 207:84]
+        if (!(cpu_io_dmem_address[23:20] == 4'h1)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 210:53]
+          pwmDutyRegs_6 <= _GEN_48;
+        end
+      end
+    end
+    if (combinedReset) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+      pwmDutyRegs_7 <= 8'h0; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+    end else if (cpuRunning & cpu_io_dmem_address[31:28] == 4'hf & cpu_io_dmem_wr) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 206:81]
+      if (!(cpu_io_dmem_address[23:20] == 4'h0 & cpu_io_dmem_address[3:0] == 4'h4)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 207:84]
+        if (!(cpu_io_dmem_address[23:20] == 4'h1)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 210:53]
+          pwmDutyRegs_7 <= _GEN_49;
+        end
+      end
+    end
+    if (combinedReset) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+      pwmDutyRegs_8 <= 8'h0; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+    end else if (cpuRunning & cpu_io_dmem_address[31:28] == 4'hf & cpu_io_dmem_wr) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 206:81]
+      if (!(cpu_io_dmem_address[23:20] == 4'h0 & cpu_io_dmem_address[3:0] == 4'h4)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 207:84]
+        if (!(cpu_io_dmem_address[23:20] == 4'h1)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 210:53]
+          pwmDutyRegs_8 <= _GEN_50;
+        end
+      end
+    end
+    if (combinedReset) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+      pwmDutyRegs_9 <= 8'h0; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+    end else if (cpuRunning & cpu_io_dmem_address[31:28] == 4'hf & cpu_io_dmem_wr) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 206:81]
+      if (!(cpu_io_dmem_address[23:20] == 4'h0 & cpu_io_dmem_address[3:0] == 4'h4)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 207:84]
+        if (!(cpu_io_dmem_address[23:20] == 4'h1)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 210:53]
+          pwmDutyRegs_9 <= _GEN_51;
+        end
+      end
+    end
+    if (combinedReset) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+      pwmDutyRegs_10 <= 8'h0; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+    end else if (cpuRunning & cpu_io_dmem_address[31:28] == 4'hf & cpu_io_dmem_wr) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 206:81]
+      if (!(cpu_io_dmem_address[23:20] == 4'h0 & cpu_io_dmem_address[3:0] == 4'h4)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 207:84]
+        if (!(cpu_io_dmem_address[23:20] == 4'h1)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 210:53]
+          pwmDutyRegs_10 <= _GEN_52;
+        end
+      end
+    end
+    if (combinedReset) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+      pwmDutyRegs_11 <= 8'h0; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+    end else if (cpuRunning & cpu_io_dmem_address[31:28] == 4'hf & cpu_io_dmem_wr) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 206:81]
+      if (!(cpu_io_dmem_address[23:20] == 4'h0 & cpu_io_dmem_address[3:0] == 4'h4)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 207:84]
+        if (!(cpu_io_dmem_address[23:20] == 4'h1)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 210:53]
+          pwmDutyRegs_11 <= _GEN_53;
+        end
+      end
+    end
+    if (combinedReset) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+      pwmDutyRegs_12 <= 8'h0; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+    end else if (cpuRunning & cpu_io_dmem_address[31:28] == 4'hf & cpu_io_dmem_wr) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 206:81]
+      if (!(cpu_io_dmem_address[23:20] == 4'h0 & cpu_io_dmem_address[3:0] == 4'h4)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 207:84]
+        if (!(cpu_io_dmem_address[23:20] == 4'h1)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 210:53]
+          pwmDutyRegs_12 <= _GEN_54;
+        end
+      end
+    end
+    if (combinedReset) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+      pwmDutyRegs_13 <= 8'h0; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+    end else if (cpuRunning & cpu_io_dmem_address[31:28] == 4'hf & cpu_io_dmem_wr) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 206:81]
+      if (!(cpu_io_dmem_address[23:20] == 4'h0 & cpu_io_dmem_address[3:0] == 4'h4)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 207:84]
+        if (!(cpu_io_dmem_address[23:20] == 4'h1)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 210:53]
+          pwmDutyRegs_13 <= _GEN_55;
+        end
+      end
+    end
+    if (combinedReset) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+      pwmDutyRegs_14 <= 8'h0; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+    end else if (cpuRunning & cpu_io_dmem_address[31:28] == 4'hf & cpu_io_dmem_wr) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 206:81]
+      if (!(cpu_io_dmem_address[23:20] == 4'h0 & cpu_io_dmem_address[3:0] == 4'h4)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 207:84]
+        if (!(cpu_io_dmem_address[23:20] == 4'h1)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 210:53]
+          pwmDutyRegs_14 <= _GEN_56;
+        end
+      end
+    end
+    if (combinedReset) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+      pwmDutyRegs_15 <= 8'h0; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 168:55]
+    end else if (cpuRunning & cpu_io_dmem_address[31:28] == 4'hf & cpu_io_dmem_wr) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 206:81]
+      if (!(cpu_io_dmem_address[23:20] == 4'h0 & cpu_io_dmem_address[3:0] == 4'h4)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 207:84]
+        if (!(cpu_io_dmem_address[23:20] == 4'h1)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 210:53]
+          pwmDutyRegs_15 <= _GEN_57;
+        end
+      end
+    end
+    uartStatusReg <= {uartRx_io_channel_valid,uartTx_io_channel_ready}; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 191:55]
+    memAddressReg <= cpu_io_dmem_address; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 192:30]
+    if (combinedReset) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 205:50]
+      ledReg <= 16'h0; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 205:50]
+    end else if (cpuRunning & cpu_io_dmem_address[31:28] == 4'hf & cpu_io_dmem_wr) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 206:81]
+      if (!(cpu_io_dmem_address[23:20] == 4'h0 & cpu_io_dmem_address[3:0] == 4'h4)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 207:84]
+        if (cpu_io_dmem_address[23:20] == 4'h1) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 210:53]
+          ledReg <= cpu_io_dmem_wrData[15:0]; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 212:14]
+        end
+      end
+    end
+    io_led_REG <= _io_led_T[15:8]; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 234:38]
+    io_led_REG_1 <= _io_led_T[6:0]; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 234:89]
   end
 // Register and memory initialization
 `ifdef RANDOMIZE_GARBAGE_ASSIGN
@@ -2009,15 +2424,49 @@ initial begin
   _RAND_1 = {1{`RANDOM}};
   cpuRunning = _RAND_1[0:0];
   _RAND_2 = {1{`RANDOM}};
-  uartStatusReg = _RAND_2[1:0];
+  pwmEnable = _RAND_2[15:0];
   _RAND_3 = {1{`RANDOM}};
-  memAddressReg = _RAND_3[31:0];
+  pwmDutyRegs_0 = _RAND_3[7:0];
   _RAND_4 = {1{`RANDOM}};
-  ledReg = _RAND_4[15:0];
+  pwmDutyRegs_1 = _RAND_4[7:0];
   _RAND_5 = {1{`RANDOM}};
-  io_led_REG = _RAND_5[7:0];
+  pwmDutyRegs_2 = _RAND_5[7:0];
   _RAND_6 = {1{`RANDOM}};
-  io_led_REG_1 = _RAND_6[6:0];
+  pwmDutyRegs_3 = _RAND_6[7:0];
+  _RAND_7 = {1{`RANDOM}};
+  pwmDutyRegs_4 = _RAND_7[7:0];
+  _RAND_8 = {1{`RANDOM}};
+  pwmDutyRegs_5 = _RAND_8[7:0];
+  _RAND_9 = {1{`RANDOM}};
+  pwmDutyRegs_6 = _RAND_9[7:0];
+  _RAND_10 = {1{`RANDOM}};
+  pwmDutyRegs_7 = _RAND_10[7:0];
+  _RAND_11 = {1{`RANDOM}};
+  pwmDutyRegs_8 = _RAND_11[7:0];
+  _RAND_12 = {1{`RANDOM}};
+  pwmDutyRegs_9 = _RAND_12[7:0];
+  _RAND_13 = {1{`RANDOM}};
+  pwmDutyRegs_10 = _RAND_13[7:0];
+  _RAND_14 = {1{`RANDOM}};
+  pwmDutyRegs_11 = _RAND_14[7:0];
+  _RAND_15 = {1{`RANDOM}};
+  pwmDutyRegs_12 = _RAND_15[7:0];
+  _RAND_16 = {1{`RANDOM}};
+  pwmDutyRegs_13 = _RAND_16[7:0];
+  _RAND_17 = {1{`RANDOM}};
+  pwmDutyRegs_14 = _RAND_17[7:0];
+  _RAND_18 = {1{`RANDOM}};
+  pwmDutyRegs_15 = _RAND_18[7:0];
+  _RAND_19 = {1{`RANDOM}};
+  uartStatusReg = _RAND_19[1:0];
+  _RAND_20 = {1{`RANDOM}};
+  memAddressReg = _RAND_20[31:0];
+  _RAND_21 = {1{`RANDOM}};
+  ledReg = _RAND_21[15:0];
+  _RAND_22 = {1{`RANDOM}};
+  io_led_REG = _RAND_22[7:0];
+  _RAND_23 = {1{`RANDOM}};
+  io_led_REG_1 = _RAND_23[6:0];
 `endif // RANDOMIZE_REG_INIT
   `endif // RANDOMIZE
 end // initial
