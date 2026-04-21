@@ -17,7 +17,7 @@ Required to run the automation scripts.
     - Ubuntu/Debian: ```sudo apt install make```
     - Fedora: ```sudo dnf install make```
 
-#### 2. Xilinx Vivado (WebPACK Edition)
+#### 2. Xilinx Vivado (WebPACK Edition) !!Only needed if softcore is not already flashed to board!!
 Required for synthesizing the hardware and flashing the FPGA. Only needed once to program the non-volatile flash.
 
 - **Download:** Xilinx Unified Installer
@@ -44,40 +44,26 @@ Required to compile the Rust program that runs on the FPGA.
     rustup component add llvm-tools
     ```
 
-#### 4. Python 3
-Required for the UART upload script.
-
-- Windows/Linux: Download from [python.org](https://python.org).
-- Install the serial library:
-    ```bash
-    pip install pyserial
-    ```
-
-#### 5. Git
-Required for cloning this repository.
-
-- Download: [git-scm.com](https://git-scm.com)
-
 ---
 
 ### :wrench: Developing on the CPU
 _Additional tools needed to modify the CPU hardware (Chisel) and run simulation tests._
 
-#### 6. Java 17+ (JDK)
+#### 4. Java 17+ (JDK)
 Required by sbt and the Chisel hardware generator.
 
 - Windows/Linux: Download from [Adoptium](https://adoptium.net/) (Eclipse Temurin 17+).
 - Linux (Ubuntu): ```sudo apt install openjdk-17-jdk```
 - Verify: ```java -version```
 
-#### 7. sbt (Scala Build Tool)
+#### 5. sbt (Scala Build Tool)
 Required to compile Chisel (`make generate-verilog`) and run simulation tests (`make sim-test`).
 
 - All platforms: Follow the install guide at [scala-sbt.org](https://www.scala-sbt.org/download.html).
 - Linux (Ubuntu): ```sudo apt install sbt``` (after adding the sbt apt repository).
 - Verify: ```sbt --version```
 
-#### 8. RISC-V Assembler/Linker
+#### 6. RISC-V Assembler/Linker
 Required to assemble the simulation test programs (`make sim-test`). Not needed for building or flashing the FPGA.
 
 - **Windows:** WSL (Windows Subsystem for Linux) with the linux-gnu binutils:
