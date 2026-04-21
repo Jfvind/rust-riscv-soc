@@ -11,8 +11,8 @@ RUST_DIR = sw/program
 RUST_TARGET = riscv32i-unknown-none-elf
 RUST_RELEASE = $(RUST_DIR)/target/$(RUST_TARGET)/release
 
-# --- Loader ---
-LOADER = sw/loader/upload.py
+# --- Uploader ---
+UPLOADER_DIR = sw/uploader
 SERIAL_PORT ?= COM5
 
 # --- Tools ---
@@ -29,15 +29,18 @@ ifdef OS
 	FIXPATH = $(subst /,\,$1)
 # Run a command through WSL (needed for Linux-only tools like riscv64-unknown-elf-gcc)
 	WSL = wsl
+# Uploader binary path (Windows has .exe)
+	UPLOADER_BIN = $(UPLOADER_DIR)/target/release/uploader.exe
 else
 # Linux / macOS
 	RM = rm -f
 	RMDIR = rm -rf
 	FIXPATH = $1
 	WSL =
+	UPLOADER_BIN = $(UPLOADER_DIR)/target/release/uploader
 endif
 
-.PHONY: all build flash clean generate-verilog rust-build upload hw-test sim-test risc-v-lab
+.PHONY: all build flash clean generate-verilog rust-build upload hw-test sim-test risc-v-lab uploader
 
 all: build
 
@@ -77,13 +80,21 @@ rust-disassemble:
 #  Upload & test via UART
 # ────────────────────────────────────────────────
 
+# File target - Builds the Rust uploader binary.
+# Cargo has built in check, so only recompiles if necessary.
+$(UPLOADER_BIN):
+	cargo build --release --manifest-path $(UPLOADER_DIR)/Cargo.toml
+
+# Alias
+uploader: $(UPLOADER_BIN)
+
 # Upload a binary to the FPGA and listen for output
-upload: rust-build
-	python $(LOADER) --port $(SERIAL_PORT) --binary $(RUST_RELEASE)/program.bin --listen 5
+upload: rust-build $(UPLOADER_BIN)
+	"$(call FIXPATH,$(UPLOADER_BIN))" --port $(SERIAL_PORT) --binary "$(call FIXPATH,$(RUST_RELEASE)/program.bin)" --listen 5
 
 # Upload and listen for expected UART output (for CI / test automation)
-hw-test: rust-build
-	python $(LOADER) --port $(SERIAL_PORT) --binary $(RUST_RELEASE)/program.bin --expect "PASS" --timeout 10
+hw-test: rust-build $(UPLOADER_BIN)
+	"$(call FIXPATH,$(UPLOADER_BIN))" --port $(SERIAL_PORT) --binary "$(call FIXPATH,$(RUST_RELEASE)/program.bin)" --expect "PASS" --timeout 10
 
 # ────────────────────────────────────────────────
 #  Simulation tests (in terminal)
@@ -112,3 +123,4 @@ clean:
 	-$(RMDIR) $(call FIXPATH, .Xil)
 	-$(RM) $(call FIXPATH, *.log)
 	-$(RM) $(call FIXPATH, *.jou)
+	-cargo clean --manifest-path $(UPLOADER_DIR)/Cargo.toml
