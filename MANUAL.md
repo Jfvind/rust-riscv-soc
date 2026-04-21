@@ -104,12 +104,17 @@ Adresserummet er delt i to områder: adresser der starter med `0x0` peger på sc
 | `0xF010_0000` | LED-register (bit 0–6, 8–15 = LEDs, bit 7 = CPU running indikator) | Skriv (bit 7 read-only) |
 | `0xF020_0000` | Button-register (bit 0–3 = btnU, btnL, btnR, btnD) | Læs |
 | `0xF030_0000`  | Base address for JXADC analog inputs, offset for four total inputs (e.g. `0xF030_0004`) | Læs |
+| `0xF040_0000`  | PWM base address for LED brightness control (enable at offset `0x00`, duty cycle channels at `0x04`-`0x44`) | Læs + Skriv |
 
 ## Workflow - fra Rust-kode til kørende program
 Når du udvikler programmer til denne SoCc, er dit workflow:
 1. Skriv eller rediger dit Rust-program i filen `sw/program/src/main.rs`
 2. Kør kommandoen `make upload SERIAL_PORT=<din_port>` fra roden af repoet (`.../rust-riscv-soc`)
 3. Dit program kompileres, uploades, og begynder at eksekvere automatisk.
+
+Testkredsløbet herunder er det hardware-setup, som bruges af koden der aktuelt kører i [sw/program/src/main.rs](sw/program/src/main.rs).
+
+![Test circuit for main.rs](Test-circuit.png)
 
 ### Hvad sker der på din pc?
 Kommandoen `make upload` automatiserer følgende kæde af handlinger:

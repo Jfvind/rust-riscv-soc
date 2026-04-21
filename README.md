@@ -92,6 +92,10 @@ Pressing any of the four directional buttons (btnU, btnL, btnR, btnD)
 will light up the corresponding LED (0-3).
 **Note:** When CPU is running, the leftmost LED is lit.
 
+The test circuit below is the hardware setup used by the code currently running in [sw/program/src/main.rs](sw/program/src/main.rs).
+
+![Test circuit for main.rs](Test-circuit.png)
+
 ### Memory Map
 
 | Address        | Description                                      |
@@ -102,6 +106,7 @@ will light up the corresponding LED (0-3).
 | `0xF010_0000`  | LED register (bit 0-6 = LED 0-6, bit 7 = CPU running indicator (read-only), bit 8-15 = LED 8-15) |
 | `0xF020_0000`  | Button register (bit 0-3 = btnU, btnL, btnR, btnD, read-only) |
 | `0xF030_0000`  | Base address for JXADC analog inputs, offset for four total inputs (e.g. `0xF030_0004`) |
+| `0xF040_0000`  | PWM base address for LED brightness control (enable at offset `0x00`, duty cycle channels at `0x04`-`0x44`) |
 
 ### 1. Clone repo
 ```bash
