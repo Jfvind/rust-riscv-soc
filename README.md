@@ -149,7 +149,7 @@ cd rust-riscv-soc
 ```
 ### 2. Flash
 Build RustSoCTop.bin from wildcat/src/main/scala/rvsoc/RustSoCTop.scala and flash to Basys3
-- **Dependency:** Make sure Basys3 is connected and turned on (And 'Prerequisites & Installation' is completed) and you terminal is in /rust-riscv-soc
+- **Dependency:** Make sure Basys3 is connected and turned on (And 'Prerequisites & Installation' is completed) and your terminal is in /rust-riscv-soc
 ```bash
 make flash
 ```
