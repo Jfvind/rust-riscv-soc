@@ -32,18 +32,17 @@ En RGB-LED er tre separate enkeltfarvede LEDs (rød, grøn, blå) pakket ind i �
 RGB-LEDs findes i to varianter: *common-anode* hvor den fælles pin er +3.3V og hver farvekanal tændes ved at trække den til ground, og *common-cathode* hvor det er omvendt. I common-anode betyder det at en *lav* duty cycle giver *høj* lysstyrke — hvilket HAL-funktionen `rgb_set` tager højde for automatisk.
 
 ## Forudsætninger og opsætning
-Forudsætningerne for at og flashe projektets softcore arkitektur over på en Basys-3 FPGA for tilsidst at uploade og køre det Rust program der udgør logikken for dit miljø-overvågningssystem er beskrevet i den installationsguide du finder i projektetes `READEME.md`-fil. 
+Forudsætningerne for at og flashe projektets softcore arkitektur over på en Basys-3 FPGA for tilsidst at uploade og køre det Rust program der udgør logikken for dit miljø-overvågningssystem er beskrevet i den installationsguide du finder i projektetes `README.md`-fil. 
+
+![Workflow for a uploade rust-kode til MCU på FPGA (Basys-3)](docs/diagrams/Rust-on-MCU-manual.svg)
 
 Herunder en forklaring af hvad hver værktøj bruges til.
 
 ### **Forudsætninger:** Værktøjer der skal være installeret
 | Værktøj | Formål |
 |---|---|
-| Make | Er et build-automatiseringsværktøj. Når du skriver en kommando som `make flash` eller `make upload`, eksekverer Make automatisk en sekvens af underliggende kommandoer i den rigtige rækkefølge. Uden Make skulle du manuelt køre hver enkelt kommando selv. |
 | Vivado | Er Xilinx' udviklingsmiljø til FPGA'er. Det tager SoC-designets hardwarebeskrivelse (genereret Verilog-kode), syntetiserer det ned til en bitstream, og flasher bitstreamen på FPGA'en. Når SoC'en er flashet, ligger den i FPGA'ens non-volatile hukommelse og overlever både genstart og slukning. Du skal kun bruge Vivado én gang — medmindre selve hardwaredesignet ændres. |
 | Rust toolchain | Er compileren der oversætter dine Rust-programmer til RISC-V maskinkode. Compileren er konfigureret med target `riscv32i-unknown-none-elf`, som fortæller den at den skal producere kode til en 32-bit RISC-V processor uden operativsystem — præcis hvad Wildcat-processoren er. |
-| Python + pyserial | Bruges af upload-scriptet (`upload.py`). Scriptet tager dit kompilerede program og sender det til boardet over en seriel USB-forbindelse (UART). Python er kun nødvendigt fordi upload-scriptet er skrevet i Python. |
-| Git | Bruges til at klone projektets repository så du har adgang til al kildekode, build-scripts, og denne manual. |
 
 Sørg for at du har installeret overstående ved at følge projektets `README.md`-fil under sektionen **"Prerequisites & Installation"** før du går videre til at flashe SoC'en ned på dit board.
 
@@ -53,7 +52,7 @@ Efter værktøjerne er installeret og repoet er klonet, skal SoC'en flahes på F
 **Flash SoC'en ved at**:
 1. Tilslut Basys-3 boardet via USB og tænd det
 2. I din terminal, naviger til roden af repoet, så du står i mappen `.../rust-riscv-soc`
-3. Kør nu kommandoen `make flash` i terminalen
+3. Kør nu kommandoen `cargo xtask flash` i terminalen
 4. SoC'en flashes: Vent på at processen færdiggøres (dette kan tage flere minutter)
 5. Tryk på PROG-knappen på FPGA (rød knap i øverste højre hjørne af boardet)
 6. Efter 5-10 sekunder bør CPU'en køre - den venstre LED lyser som indikation
@@ -64,11 +63,11 @@ Når først SoC'en er flashet, kan du uploade Rust-programmer (igen og igen) via
 1. Find din serielle port:
     - **Windows:** `Get-PnpDevice -Class Ports -PresentOnly`
     - **Linux:** `ls /dev/ttyUSB* /dev/ttyACM*`
-2. Upload programmet ved at skrive kommandoen `make upload SERIAL_PORT=<din_port>` i terminalen
+2. Upload programmet ved at skrive kommandoen `cargo xtask upload <din_port>` i terminalen
 3. Programmet kompilere automatisk, uploades, og begynder at køre. Output fra programmet vises i terminalen.
 
 **Itterer i jeres program design:**
-Efterfølgende ændringer i Rust-koden kan uploades ved at køre `make upload` igen. Det er ikke nødvændigt at reflashe SoC'en for at uplade nye programmer. 
+Efterfølgende ændringer i Rust-koden kan uploades ved at køre `cargo xtask upload <din_port>` igen. Det er ikke nødvændigt at reflashe SoC'en for at uplade nye programmer. 
 
 Testkredsløbet herunder er det hardware-setup, som bruges af koden der aktuelt kører i [sw/program/src/main.rs](sw/program/src/main.rs).
 
@@ -127,14 +126,14 @@ Adresserummet er delt i to områder: adresser der starter med `0x0` peger på sc
 ## Workflow - fra Rust-kode til kørende program
 Når du udvikler programmer til denne SoCc, er dit workflow:
 1. Skriv eller rediger dit Rust-program i filen `sw/program/src/main.rs`
-2. Kør kommandoen `make upload SERIAL_PORT=<din_port>` fra roden af repoet (`.../rust-riscv-soc`)
+2. Kør kommandoen `cargo xtask upload <din_port>` fra roden af repoet (`.../rust-riscv-soc`)
 3. Dit program kompileres, uploades, og begynder at eksekvere automatisk.
 
 ### Hvad sker der på din pc?
-Kommandoen `make upload` automatiserer følgende kæde af handlinger:
+Kommandoen `cargo xtask upload` automatiserer følgende kæde af handlinger:
 1. **Kompilering:** Cargo (Rusts build-system) kompilerer dit Rust-program til en RISC-V ELF-fil. ELF-formatet indeholder maskinkode plus metadata om programmets struktur (Hvor kode og data starter, symbolnavne osv.)
 2. **Konvertering:** `cargo objcopy` konverterer denne ELF-fil til en rå binærfil (`program.bin`). Denne fil indeholder udelukkende maskinkode uden metadata - det er de bytes der skal ligges ind i hukommelsen på din basys-3 FPGA.
-3. **Upload:** Python-scriptet `upload.py` sender binærfilen over USB/UART til FPGA'en. Scriptet håndterer reset, aktivering af bootloader, og overførsel af programdata (se bootflow sektion for flere detaljer).
+3. **Upload:** rust-craten `uploader` sender binærfilen over USB/UART til FPGA'en. Scriptet håndterer reset, aktivering af bootloader, og overførsel af programdata (se bootflow sektion for flere detaljer).
 4. **Eksekvering:** Når upload er færdig, frigiver bootloaderen CPU'en og dit progream eksekveres fra adresse `0x0000_0000`.
 
 ### Filstruktur
@@ -145,7 +144,7 @@ er den eneste fil du behøver at redigere under normal brug.
 **Note:** Hvis du løber ind i hukommelsesbegrænsninger (4 KB), 
 er det muligt at udvide hukommelsen ved at ændre størrelsen i 
 `sw/program/linker.ld` og `wildcat/src/main/scala/rvsoc/RustSoCTop.scala`, 
-efterfulgt af et `make flash`. Kontakt en underviser inden du 
+efterfulgt af et `cargo xtask flash`. Kontakt en underviser inden du 
 gør dette.
 
 ## HAL-reference: tilgængelige funktioner og adresser
@@ -260,7 +259,7 @@ println!("Tallet er: {}", 42);
 println!("Knapper: 0x{:X}", btn_read());
 ```
 
-Output kan ses i terminalen efter `make upload`, eller med et 
+Output kan ses i terminalen efter `cargo xtask upload <din_port>`, eller med et 
 serielt terminalprogram (115200 baud, 8N1).
 
 ### Avanceret: Direkte MMIO
@@ -377,11 +376,11 @@ fn main() {
 
 ## Fejlfinding
 
-### "make upload" fejler med "Could not open port"
+### "cargo xtask upload" fejler med "Could not open port"
 
 Seriel porten er enten forkert angivet eller i brug af et 
 andet program. Tjek at du har angivet den rigtige port med 
-`SERIAL_PORT=<din_port>`. Luk eventuelle andre programmer 
+`cargo xtask upload <din_port>`. Luk eventuelle andre programmer 
 der bruger porten (serielle terminaler, andre upload-scripts).
 
 ### Ingen output i terminalen efter upload
@@ -389,15 +388,15 @@ der bruger porten (serielle terminaler, andre upload-scripts).
 Tjek at din serielle port er korrekt. Tjek at boardet er 
 tændt og at SoC'en er flashet (venstre LED skal lyse). 
 Prøv at trykke på PROG-knappen og vent 5-10 sekunder 
-inden du kører `make upload` igen.
+inden du kører `cargo xtask upload <din_port>` igen.
 
 ### Programmet virker ikke efter ændringer i koden
 
-Sørg for at du gemmer filen inden du kører `make upload`. 
+Sørg for at du gemmer filen inden du kører `cargo xtask upload <din_port>`. 
 Tjek terminalens output for kompileringsfejl — Rust-compileren 
 giver typisk præcise fejlbeskeder med linjenummer.
 
-### "make flash" fejler
+### "cargo xtask flash" fejler
 
 Tjek følgende:
 - **Er Vivado installeret?** Følg installationsguiden i README

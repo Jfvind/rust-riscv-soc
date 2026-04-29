@@ -7,23 +7,7 @@ Allows you to run rust code on your FPGA through a Wildcat Risc-V.
 ### :rocket: Running Rust on the CPU
 _Everything you need to write Rust programs and execute them on the FPGA._
 
-#### 1. Make (Build Tool)
-Required to run the automation scripts.
-
-**Check if installed:**
-```bash
-make --version
-```
-If you see a version number, Make is already installed — skip to the next tool. If not, proceed with installation:
-
-- Windows:
-    - Option A (Recommended): Install via Chocolatey. Open PowerShell as Admin and run: ```choco install make```
-    - Option B: Download GnuWin32 Make, install it, and add C:\Program Files (x86)\GnuWin32\bin to your PATH.
-- Linux:
-    - Ubuntu/Debian: ```sudo apt install make```
-    - Fedora: ```sudo dnf install make```
-
-#### 2. Xilinx Vivado (WebPACK Edition) !!Only needed if softcore is not already flashed to board!!
+#### 1. Xilinx Vivado (WebPACK Edition) !!Only needed if softcore is not already flashed to board!!
 Required for synthesizing the hardware and flashing the FPGA. Only needed once to program the non-volatile flash.
 
 **Check if installed:**
@@ -39,7 +23,7 @@ If you see version information, Vivado is already installed and in your PATH —
     - *Windows:* Add `C:\Xilinx\Vivado\20xx.x\bin` to Environment Variables → Path.
     - *Linux:* Add `source /tools/Xilinx/Vivado/20xx.x/settings64.sh` to your `.bashrc` or `.zshrc`.
 
-#### 3. Rust Toolchain
+#### 2. Rust Toolchain
 Required to compile the Rust program that runs on the FPGA.
 
 **Check if installed:**
@@ -68,7 +52,7 @@ If both commands show version numbers, Rust is already installed — verify the 
 ### :wrench: Developing on the CPU
 _Additional tools needed to modify the CPU hardware (Chisel) and run simulation tests._
 
-#### 4. Java 17+ (JDK)
+#### 3. Java 17+ (JDK)
 Required by sbt and the Chisel hardware generator.
 
 **Check if installed:**
@@ -81,8 +65,8 @@ If you see a version number that is 17 or higher (e.g., `17.0.x`, `21.0.x`), Jav
 - Linux (Ubuntu): ```sudo apt install openjdk-17-jdk```
 - Verify: ```java -version```
 
-#### 5. sbt (Scala Build Tool)
-Required to compile Chisel (`make generate-verilog`) and run simulation tests (`make sim-test`).
+#### 4. sbt (Scala Build Tool)
+Required to compile Chisel (`cargo xtask build-hw`) and run simulation tests (`cargo xtask sim-test`).
 
 **Check if installed:**
 ```bash
@@ -94,15 +78,15 @@ If you see a version number, sbt is already installed — skip to the next tool.
 - Linux (Ubuntu): ```sudo apt install sbt``` (after adding the sbt apt repository).
 - Verify: ```sbt --version```
 
-#### 6. RISC-V Assembler/Linker
-Required to assemble the simulation test programs (`make sim-test`). Not needed for building or flashing the FPGA.
+#### 5. RISC-V Assembler/Linker
+Required to assemble the simulation test programs (`cargo xtask sim-test`). Not needed for building or flashing the FPGA.
 
 **Check if installed:**
 
 - **Windows (inside WSL):**
-  ```bash
-  wsl riscv64-linux-gnu-as --version
-  ```
+    ```bash
+    wsl riscv64-linux-gnu-as --version
+    ```
 - **Linux:**
   ```bash
   riscv64-unknown-elf-as --version  # or
@@ -116,6 +100,22 @@ If you see version information, the RISC-V tools are installed — skip to the n
 - **Linux (Ubuntu 24.04+):** `sudo apt-get install -y binutils-riscv64-linux-gnu`
 - **Linux (Ubuntu 22.04 and earlier):** `sudo apt-get install -y gcc-riscv64-unknown-elf`
 
+#### 6. Make (Build Tool)
+Required for the legacy `make` workflow and for some older instructions in the project history.
+
+**Check if installed:**
+```bash
+make --version
+```
+If you see a version number, Make is already installed. This project now uses `cargo xtask` instead of `make` for the normal workflow, so you only need Make if you are following an older script or comparing against the legacy setup.
+
+- Windows:
+    - Option A (Recommended): Install via Chocolatey. Open PowerShell as Admin and run: `choco install make`
+    - Option B: Download GnuWin32 Make, install it, and add `C:\Program Files (x86)\GnuWin32\bin` to your PATH.
+- Linux:
+    - Ubuntu/Debian: `sudo apt install make`
+    - Fedora: `sudo dnf install make`
+
 ## :rocket: Getting started
 After boot, the program prints "PASS" over UART and demonstrates all peripherals:
 - **ADC bar-graph:** Onboard LEDs 0-6 light up as a bar-graph based on the first JXADC analaog input
@@ -126,7 +126,9 @@ After boot, the program prints "PASS" over UART and demonstrates all peripherals
 
 The test circuit below is the hardware setup used by the code currently running in [sw/program/src/main.rs](sw/program/src/main.rs).
 
-![Test circuit for main.rs](Test-circuit.png)
+![Test circuit for main.rs](docs/diagrams/Test-circuit.png)
+
+![Quick workflow for running program on MCU](docs/diagrams/Rust-on-MCU-Quickguide.svg)
 
 ### 1. Clone repo (requires git) OR download release zip
 ```bash
@@ -137,14 +139,14 @@ cd rust-riscv-soc
 Build RustSoCTop.bin from wildcat/src/main/scala/rvsoc/RustSoCTop.scala and flash to Basys3
 - **Dependency:** Make sure Basys3 is connected and turned on (And 'Prerequisites & Installation' is completed) and your terminal is in /rust-riscv-soc
 ```bash
-make flash
+cargo xtask flash
 ```
 - **Duration:** 3 minutes to a lifetime :skull:
 - **Output:** 
     - Makes a Vivado project at hw/vivado
     - Generates .jou and .log in root
     - Generates /.Xil in root
-- *Note*: it is possible to only build the .bin and .bit files using `make build`, this doesn't flash the FPGA memory.
+- *Note*: it is possible to only build the `.bin` and `.bit` files using `cargo xtask build-hw`, this doesn't flash the FPGA memory.
 
 ### :arrow_forward: 3. PROG
 Press the red button in top right corner of the Basys3.
@@ -168,18 +170,18 @@ Look for something like /dev/ttyUSB0 or /dev/ttyUSB1.
 
 **Second:** Upload rust code
 ```bash
-make upload SERIAL_PORT=<your_COM_port>
+cargo xtask upload <your_COM_port>
 ```
-**Note:** You can re-upload anytime after changin the rust file and then running ```make upload``` again.
+**Note:** You can re-upload anytime after changing the rust file and then running `cargo xtask upload <your_COM_port>` again.
 
 ### :broom: 5. Clean up (Optional)
 Since the CPU is stored in the flash memory, the generated files are not necessary.
-**Note:** if making changes to the CPU and the hw/vivado is cleaned away, then *make flash* will take longer.
+**Note:** if making changes to the CPU and the hw/vivado is cleaned away, then `cargo xtask flash` will take longer.
 
 ## Changes to schoeberl/wildcat
 Static version from feb-2026.
 
 - Added top module instantiating bootloader at src/main/scala/rvsoc.
 - Added WSL detection in src/main/scala/Util.scala for running tests in powershell.
-- Changed calling of make app to correct path for powershell calling (SimulatorTest, SingleCycleTest, WildcatTest, WildcatTestUart).
+- Updated the imported Wildcat repo to work with the local PowerShell-based workflow (SimulatorTest, SingleCycleTest, WildcatTest, WildcatTestUart).
 - Added WSL detection in Makefile for binary compilation (riscv64 toolchain).
