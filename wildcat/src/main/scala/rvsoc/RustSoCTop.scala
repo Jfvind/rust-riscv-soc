@@ -71,12 +71,12 @@ class TriStateBuffer8 extends HasBlackBoxInline {
  *   0xF000_0000               : UART status  (bit 0 = TX ready, bit 1 = RX data available)
  *   0xF000_0004               : UART data    (read = RX byte, write = TX byte)
  *   0xF010_0000               : on-board LEDs (lower 7 bits drive LEDs)
- *   0xF020_0000               : on-board Buttons (bit 0-3 = btnU, btnL, btnR, btnD)
+ *   0xF020_0000               : debounced on-board Buttons (bit 0-3 = btnU, btnL, btnR, btnD)
  *   0xF030_000X               : ADC (0=Ch1, 4=Ch2, 8=Ch3, C=Ch4)
  *   0xF040_000X               : PWM (0=Enable, 4-40=Duty cycles)
- *   0xF050_000X               : PMOD JA (0=DIR, 4=OUT, 8=IN)
- *   0xF060_000X               : PMOD JB (0=DIR, 4=OUT, 8=IN)
- *   0xF070_000X               : PMOD JC (0=DIR, 4=OUT, 8=IN)
+ *   0xF050_000X               : PMOD JA (0=DIR, 4=OUT, 8=IN, C=PWM_EN, 10=IN_DEBOUNCED)
+ *   0xF060_000X               : PMOD JB (0=DIR, 4=OUT, 8=IN, C=PWM_EN, 10=IN_DEBOUNCED)
+ *   0xF070_000X               : PMOD JC (0=DIR, 4=OUT, 8=IN, C=PWM_EN, 10=IN_DEBOUNCED)
  *
  * @param frequ     system clock frequency in Hz (default 100 MHz for Basys3)
  * @param baudRate  UART baud rate (default 115200)
@@ -275,6 +275,14 @@ class RustSoCTop(frequ: Int = 100000000, baudRate: Int = 115200, memBytes: Int =
   uartRx.io.channel.ready := false.B
 
   // ====================================
+  // Input debouncing
+  // ====================================
+  val debounceCycles = scala.math.max(1, frequ / 100)
+
+  val btnDebouncer = withReset(combinedReset) { Module(new ButtonDebouncer(4, debounceCycles)) }
+  btnDebouncer.io.in := io.btn
+
+  // ====================================
   // GPIO tri-state buffer registers
   // ====================================
   // JA - PWM channels 0-7
@@ -282,6 +290,7 @@ class RustSoCTop(frequ: Int = 100000000, baudRate: Int = 115200, memBytes: Int =
   val gpioJAOutReg = withReset(combinedReset) { RegInit(0.U(8.W)) } // 0xF050_0004
   val gpioJAIn     = Wire(UInt(8.W))                                      // 0xF050_0008
   val gpioJAPwmEn  = withReset(combinedReset) { RegInit(0.U(8.W)) } // 0xF050_000C
+  val gpioJADebounced = Wire(UInt(8.W))                            // 0xF050_0010
   val bufJA = Module(new TriStateBuffer8)
   attach(io.gpioJA, bufJA.io.pad)
   bufJA.io.dir := gpioJADirReg
@@ -291,12 +300,16 @@ class RustSoCTop(frequ: Int = 100000000, baudRate: Int = 115200, memBytes: Int =
   }
   bufJA.io.out := finalJAOut.asUInt
   gpioJAIn  := bufJA.io.in
+  val gpioJADebouncer = withReset(combinedReset) { Module(new ButtonDebouncer(8, debounceCycles, initialValue = 0xff)) }
+  gpioJADebouncer.io.in := gpioJAIn
+  gpioJADebounced := gpioJADebouncer.io.out
 
   // JB - PWM channels 8-15
   val gpioJBDirReg = withReset(combinedReset) { RegInit(0.U(8.W)) } // 0xF060_0000
   val gpioJBOutReg = withReset(combinedReset) { RegInit(0.U(8.W)) } // 0xF060_0004
   val gpioJBIn     = Wire(UInt(8.W))                                // 0xF060_0008
   val gpioJBPwmEn  = withReset(combinedReset) { RegInit(0.U(8.W)) } // 0xF060_000C
+  val gpioJBDebounced = Wire(UInt(8.W))                              // 0xF060_0010
   val bufJB = Module(new TriStateBuffer8)
   attach(io.gpioJB, bufJB.io.pad)
   bufJB.io.dir := gpioJBDirReg
@@ -306,12 +319,16 @@ class RustSoCTop(frequ: Int = 100000000, baudRate: Int = 115200, memBytes: Int =
   }
   bufJB.io.out := finalJBOut.asUInt
   gpioJBIn  := bufJB.io.in
+  val gpioJBDebouncer = withReset(combinedReset) { Module(new ButtonDebouncer(8, debounceCycles, initialValue = 0xff)) }
+  gpioJBDebouncer.io.in := gpioJBIn
+  gpioJBDebounced := gpioJBDebouncer.io.out
 
   // JC - PWM channels 16-23
   val gpioJCDirReg = withReset(combinedReset) { RegInit(0.U(8.W)) } // 0xF070_0000
   val gpioJCOutReg = withReset(combinedReset) { RegInit(0.U(8.W)) } // 0xF070_0004
   val gpioJCIn     = Wire(UInt(8.W))                                // 0xF070_0008
   val gpioJCPwmEn  = withReset(combinedReset) { RegInit(0.U(8.W)) } // 0xF070_000C
+  val gpioJCDebounced = Wire(UInt(8.W))                              // 0xF070_0010
   val bufJC = Module(new TriStateBuffer8)
   attach(io.gpioJC, bufJC.io.pad)
   bufJC.io.dir := gpioJCDirReg
@@ -321,6 +338,9 @@ class RustSoCTop(frequ: Int = 100000000, baudRate: Int = 115200, memBytes: Int =
   }
   bufJC.io.out := finalJCOut.asUInt
   gpioJCIn  := bufJC.io.in
+  val gpioJCDebouncer = withReset(combinedReset) { Module(new ButtonDebouncer(8, debounceCycles, initialValue = 0xff)) }
+  gpioJCDebouncer.io.in := gpioJCIn
+  gpioJCDebounced := gpioJCDebouncer.io.out
 
   // ====================================
   // Memory-mapped IO Decoder
@@ -378,7 +398,7 @@ class RustSoCTop(frequ: Int = 100000000, baudRate: Int = 115200, memBytes: Int =
         when(offset === 0.U) { cpu.io.dmem.rdData := RegNext(uartRx.io.channel.valid ## uartTx.io.channel.ready) }
         .elsewhen(offset === 4.U) { cpu.io.dmem.rdData := uartRx.io.channel.bits }
       }
-      is(2.U) { cpu.io.dmem.rdData := io.btn } // on-board BTN (0xF020)
+      is(2.U) { cpu.io.dmem.rdData := btnDebouncer.io.out } // debounced on-board BTN (0xF020)
       is(3.U) { // ADC (0xF030)
         when(offset === 0.U)       { cpu.io.dmem.rdData := adc.io.adcData0 }
         .elsewhen(offset === 4.U)  { cpu.io.dmem.rdData := adc.io.adcData1 }
@@ -396,18 +416,21 @@ class RustSoCTop(frequ: Int = 100000000, baudRate: Int = 115200, memBytes: Int =
         .elsewhen(offset === 4.U)  { cpu.io.dmem.rdData := gpioJAOutReg }
         .elsewhen(offset === 8.U)  { cpu.io.dmem.rdData := gpioJAIn }
         .elsewhen(offset === 12.U) { cpu.io.dmem.rdData := gpioJAPwmEn }
+        .elsewhen(offset === 16.U) { cpu.io.dmem.rdData := gpioJADebounced }
       }
       is(6.U) { // JB (0xF060)
         when(offset === 0.U)       { cpu.io.dmem.rdData := gpioJBDirReg }
         .elsewhen(offset === 4.U)  { cpu.io.dmem.rdData := gpioJBOutReg }
         .elsewhen(offset === 8.U)  { cpu.io.dmem.rdData := gpioJBIn }
         .elsewhen(offset === 12.U) { cpu.io.dmem.rdData := gpioJBPwmEn }
+        .elsewhen(offset === 16.U) { cpu.io.dmem.rdData := gpioJBDebounced }
       }
       is(7.U) { // JC (0xF070)
         when(offset === 0.U)       { cpu.io.dmem.rdData := gpioJCDirReg }
         .elsewhen(offset === 4.U)  { cpu.io.dmem.rdData := gpioJCOutReg }
         .elsewhen(offset === 8.U)  { cpu.io.dmem.rdData := gpioJCIn }
         .elsewhen(offset === 12.U) { cpu.io.dmem.rdData := gpioJCPwmEn }
+        .elsewhen(offset === 16.U) { cpu.io.dmem.rdData := gpioJCDebounced }
       }
     }
   }

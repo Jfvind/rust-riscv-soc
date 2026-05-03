@@ -1804,6 +1804,424 @@ module BufferedTx(
   assign buf__io_in_bits = io_channel_bits; // @[ip-contributions/src/main/scala/chisel/lib/uart/Uart.scala 146:13]
   assign buf__io_out_ready = tx_io_channel_ready; // @[ip-contributions/src/main/scala/chisel/lib/uart/Uart.scala 147:17]
 endmodule
+module ButtonDebouncer(
+  input        clock,
+  input        reset,
+  input  [3:0] io_in, // @[src/main/scala/rvsoc/ButtonDebouncer.scala 11:14]
+  output [3:0] io_out // @[src/main/scala/rvsoc/ButtonDebouncer.scala 11:14]
+);
+`ifdef RANDOMIZE_REG_INIT
+  reg [31:0] _RAND_0;
+  reg [31:0] _RAND_1;
+  reg [31:0] _RAND_2;
+  reg [31:0] _RAND_3;
+  reg [31:0] _RAND_4;
+  reg [31:0] _RAND_5;
+  reg [31:0] _RAND_6;
+  reg [31:0] _RAND_7;
+  reg [31:0] _RAND_8;
+  reg [31:0] _RAND_9;
+`endif // RANDOMIZE_REG_INIT
+  reg [3:0] sync0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 16:22]
+  reg [3:0] sync1; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 17:22]
+  reg [19:0] counters_0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+  reg [19:0] counters_1; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+  reg [19:0] counters_2; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+  reg [19:0] counters_3; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+  reg  stable_0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:23]
+  reg  stable_1; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:23]
+  reg  stable_2; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:23]
+  reg  stable_3; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:23]
+  wire [19:0] _counters_0_T_1 = counters_0 + 20'h1; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 32:34]
+  wire [19:0] _counters_1_T_1 = counters_1 + 20'h1; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 32:34]
+  wire [19:0] _counters_2_T_1 = counters_2 + 20'h1; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 32:34]
+  wire [19:0] _counters_3_T_1 = counters_3 + 20'h1; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 32:34]
+  wire [1:0] io_out_lo = {stable_1,stable_0}; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 36:20]
+  wire [1:0] io_out_hi = {stable_3,stable_2}; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 36:20]
+  assign io_out = {io_out_hi,io_out_lo}; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 36:20]
+  always @(posedge clock) begin
+    if (reset) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 16:22]
+      sync0 <= 4'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 16:22]
+    end else begin
+      sync0 <= io_in; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 16:22]
+    end
+    if (reset) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 17:22]
+      sync1 <= 4'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 17:22]
+    end else begin
+      sync1 <= sync0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 17:22]
+    end
+    if (reset) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+      counters_0 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+    end else if (sync1[0] == stable_0) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 26:34]
+      counters_0 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 27:19]
+    end else if (counters_0 == 20'hf423f) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 28:70]
+      counters_0 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 30:19]
+    end else begin
+      counters_0 <= _counters_0_T_1; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 32:19]
+    end
+    if (reset) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+      counters_1 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+    end else if (sync1[1] == stable_1) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 26:34]
+      counters_1 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 27:19]
+    end else if (counters_1 == 20'hf423f) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 28:70]
+      counters_1 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 30:19]
+    end else begin
+      counters_1 <= _counters_1_T_1; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 32:19]
+    end
+    if (reset) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+      counters_2 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+    end else if (sync1[2] == stable_2) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 26:34]
+      counters_2 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 27:19]
+    end else if (counters_2 == 20'hf423f) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 28:70]
+      counters_2 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 30:19]
+    end else begin
+      counters_2 <= _counters_2_T_1; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 32:19]
+    end
+    if (reset) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+      counters_3 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+    end else if (sync1[3] == stable_3) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 26:34]
+      counters_3 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 27:19]
+    end else if (counters_3 == 20'hf423f) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 28:70]
+      counters_3 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 30:19]
+    end else begin
+      counters_3 <= _counters_3_T_1; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 32:19]
+    end
+    if (reset) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:23]
+      stable_0 <= 1'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:23]
+    end else if (!(sync1[0] == stable_0)) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 26:34]
+      if (counters_0 == 20'hf423f) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 28:70]
+        stable_0 <= sync1[0]; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 29:17]
+      end
+    end
+    if (reset) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:23]
+      stable_1 <= 1'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:23]
+    end else if (!(sync1[1] == stable_1)) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 26:34]
+      if (counters_1 == 20'hf423f) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 28:70]
+        stable_1 <= sync1[1]; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 29:17]
+      end
+    end
+    if (reset) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:23]
+      stable_2 <= 1'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:23]
+    end else if (!(sync1[2] == stable_2)) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 26:34]
+      if (counters_2 == 20'hf423f) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 28:70]
+        stable_2 <= sync1[2]; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 29:17]
+      end
+    end
+    if (reset) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:23]
+      stable_3 <= 1'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:23]
+    end else if (!(sync1[3] == stable_3)) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 26:34]
+      if (counters_3 == 20'hf423f) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 28:70]
+        stable_3 <= sync1[3]; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 29:17]
+      end
+    end
+  end
+// Register and memory initialization
+`ifdef RANDOMIZE_GARBAGE_ASSIGN
+`define RANDOMIZE
+`endif
+`ifdef RANDOMIZE_INVALID_ASSIGN
+`define RANDOMIZE
+`endif
+`ifdef RANDOMIZE_REG_INIT
+`define RANDOMIZE
+`endif
+`ifdef RANDOMIZE_MEM_INIT
+`define RANDOMIZE
+`endif
+`ifndef RANDOM
+`define RANDOM $random
+`endif
+`ifdef RANDOMIZE_MEM_INIT
+  integer initvar;
+`endif
+`ifndef SYNTHESIS
+`ifdef FIRRTL_BEFORE_INITIAL
+`FIRRTL_BEFORE_INITIAL
+`endif
+initial begin
+  `ifdef RANDOMIZE
+    `ifdef INIT_RANDOM
+      `INIT_RANDOM
+    `endif
+    `ifndef VERILATOR
+      `ifdef RANDOMIZE_DELAY
+        #`RANDOMIZE_DELAY begin end
+      `else
+        #0.002 begin end
+      `endif
+    `endif
+`ifdef RANDOMIZE_REG_INIT
+  _RAND_0 = {1{`RANDOM}};
+  sync0 = _RAND_0[3:0];
+  _RAND_1 = {1{`RANDOM}};
+  sync1 = _RAND_1[3:0];
+  _RAND_2 = {1{`RANDOM}};
+  counters_0 = _RAND_2[19:0];
+  _RAND_3 = {1{`RANDOM}};
+  counters_1 = _RAND_3[19:0];
+  _RAND_4 = {1{`RANDOM}};
+  counters_2 = _RAND_4[19:0];
+  _RAND_5 = {1{`RANDOM}};
+  counters_3 = _RAND_5[19:0];
+  _RAND_6 = {1{`RANDOM}};
+  stable_0 = _RAND_6[0:0];
+  _RAND_7 = {1{`RANDOM}};
+  stable_1 = _RAND_7[0:0];
+  _RAND_8 = {1{`RANDOM}};
+  stable_2 = _RAND_8[0:0];
+  _RAND_9 = {1{`RANDOM}};
+  stable_3 = _RAND_9[0:0];
+`endif // RANDOMIZE_REG_INIT
+  `endif // RANDOMIZE
+end // initial
+`ifdef FIRRTL_AFTER_INITIAL
+`FIRRTL_AFTER_INITIAL
+`endif
+`endif // SYNTHESIS
+endmodule
+module ButtonDebouncer_1(
+  input        clock,
+  input        reset,
+  input  [7:0] io_in, // @[src/main/scala/rvsoc/ButtonDebouncer.scala 11:14]
+  output [7:0] io_out // @[src/main/scala/rvsoc/ButtonDebouncer.scala 11:14]
+);
+`ifdef RANDOMIZE_REG_INIT
+  reg [31:0] _RAND_0;
+  reg [31:0] _RAND_1;
+  reg [31:0] _RAND_2;
+  reg [31:0] _RAND_3;
+  reg [31:0] _RAND_4;
+  reg [31:0] _RAND_5;
+  reg [31:0] _RAND_6;
+  reg [31:0] _RAND_7;
+  reg [31:0] _RAND_8;
+  reg [31:0] _RAND_9;
+  reg [31:0] _RAND_10;
+  reg [31:0] _RAND_11;
+  reg [31:0] _RAND_12;
+  reg [31:0] _RAND_13;
+  reg [31:0] _RAND_14;
+  reg [31:0] _RAND_15;
+  reg [31:0] _RAND_16;
+  reg [31:0] _RAND_17;
+`endif // RANDOMIZE_REG_INIT
+  reg [7:0] sync0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 16:22]
+  reg [7:0] sync1; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 17:22]
+  reg [19:0] counters_0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+  reg [19:0] counters_1; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+  reg [19:0] counters_2; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+  reg [19:0] counters_3; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+  reg [19:0] counters_4; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+  reg [19:0] counters_5; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+  reg [19:0] counters_6; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+  reg [19:0] counters_7; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+  reg  stable_0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:23]
+  reg  stable_1; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:23]
+  reg  stable_2; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:23]
+  reg  stable_3; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:23]
+  reg  stable_4; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:23]
+  reg  stable_5; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:23]
+  reg  stable_6; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:23]
+  reg  stable_7; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:23]
+  wire [19:0] _counters_0_T_1 = counters_0 + 20'h1; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 32:34]
+  wire  _GEN_0 = counters_0 == 20'hf423f ? sync1[0] : stable_0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 28:70 29:17 21:23]
+  wire  _GEN_3 = sync1[0] == stable_0 ? stable_0 : _GEN_0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:23 26:34]
+  wire [19:0] _counters_1_T_1 = counters_1 + 20'h1; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 32:34]
+  wire  _GEN_4 = counters_1 == 20'hf423f ? sync1[1] : stable_1; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 28:70 29:17 21:23]
+  wire  _GEN_7 = sync1[1] == stable_1 ? stable_1 : _GEN_4; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:23 26:34]
+  wire [19:0] _counters_2_T_1 = counters_2 + 20'h1; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 32:34]
+  wire  _GEN_8 = counters_2 == 20'hf423f ? sync1[2] : stable_2; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 28:70 29:17 21:23]
+  wire  _GEN_11 = sync1[2] == stable_2 ? stable_2 : _GEN_8; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:23 26:34]
+  wire [19:0] _counters_3_T_1 = counters_3 + 20'h1; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 32:34]
+  wire  _GEN_12 = counters_3 == 20'hf423f ? sync1[3] : stable_3; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 28:70 29:17 21:23]
+  wire  _GEN_15 = sync1[3] == stable_3 ? stable_3 : _GEN_12; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:23 26:34]
+  wire [19:0] _counters_4_T_1 = counters_4 + 20'h1; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 32:34]
+  wire  _GEN_16 = counters_4 == 20'hf423f ? sync1[4] : stable_4; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 28:70 29:17 21:23]
+  wire  _GEN_19 = sync1[4] == stable_4 ? stable_4 : _GEN_16; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:23 26:34]
+  wire [19:0] _counters_5_T_1 = counters_5 + 20'h1; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 32:34]
+  wire  _GEN_20 = counters_5 == 20'hf423f ? sync1[5] : stable_5; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 28:70 29:17 21:23]
+  wire  _GEN_23 = sync1[5] == stable_5 ? stable_5 : _GEN_20; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:23 26:34]
+  wire [19:0] _counters_6_T_1 = counters_6 + 20'h1; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 32:34]
+  wire  _GEN_24 = counters_6 == 20'hf423f ? sync1[6] : stable_6; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 28:70 29:17 21:23]
+  wire  _GEN_27 = sync1[6] == stable_6 ? stable_6 : _GEN_24; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:23 26:34]
+  wire [19:0] _counters_7_T_1 = counters_7 + 20'h1; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 32:34]
+  wire  _GEN_28 = counters_7 == 20'hf423f ? sync1[7] : stable_7; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 28:70 29:17 21:23]
+  wire  _GEN_31 = sync1[7] == stable_7 ? stable_7 : _GEN_28; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:23 26:34]
+  wire [3:0] io_out_lo = {stable_3,stable_2,stable_1,stable_0}; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 36:20]
+  wire [3:0] io_out_hi = {stable_7,stable_6,stable_5,stable_4}; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 36:20]
+  assign io_out = {io_out_hi,io_out_lo}; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 36:20]
+  always @(posedge clock) begin
+    if (reset) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 16:22]
+      sync0 <= 8'hff; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 16:22]
+    end else begin
+      sync0 <= io_in; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 16:22]
+    end
+    if (reset) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 17:22]
+      sync1 <= 8'hff; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 17:22]
+    end else begin
+      sync1 <= sync0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 17:22]
+    end
+    if (reset) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+      counters_0 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+    end else if (sync1[0] == stable_0) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 26:34]
+      counters_0 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 27:19]
+    end else if (counters_0 == 20'hf423f) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 28:70]
+      counters_0 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 30:19]
+    end else begin
+      counters_0 <= _counters_0_T_1; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 32:19]
+    end
+    if (reset) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+      counters_1 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+    end else if (sync1[1] == stable_1) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 26:34]
+      counters_1 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 27:19]
+    end else if (counters_1 == 20'hf423f) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 28:70]
+      counters_1 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 30:19]
+    end else begin
+      counters_1 <= _counters_1_T_1; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 32:19]
+    end
+    if (reset) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+      counters_2 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+    end else if (sync1[2] == stable_2) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 26:34]
+      counters_2 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 27:19]
+    end else if (counters_2 == 20'hf423f) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 28:70]
+      counters_2 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 30:19]
+    end else begin
+      counters_2 <= _counters_2_T_1; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 32:19]
+    end
+    if (reset) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+      counters_3 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+    end else if (sync1[3] == stable_3) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 26:34]
+      counters_3 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 27:19]
+    end else if (counters_3 == 20'hf423f) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 28:70]
+      counters_3 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 30:19]
+    end else begin
+      counters_3 <= _counters_3_T_1; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 32:19]
+    end
+    if (reset) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+      counters_4 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+    end else if (sync1[4] == stable_4) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 26:34]
+      counters_4 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 27:19]
+    end else if (counters_4 == 20'hf423f) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 28:70]
+      counters_4 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 30:19]
+    end else begin
+      counters_4 <= _counters_4_T_1; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 32:19]
+    end
+    if (reset) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+      counters_5 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+    end else if (sync1[5] == stable_5) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 26:34]
+      counters_5 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 27:19]
+    end else if (counters_5 == 20'hf423f) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 28:70]
+      counters_5 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 30:19]
+    end else begin
+      counters_5 <= _counters_5_T_1; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 32:19]
+    end
+    if (reset) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+      counters_6 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+    end else if (sync1[6] == stable_6) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 26:34]
+      counters_6 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 27:19]
+    end else if (counters_6 == 20'hf423f) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 28:70]
+      counters_6 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 30:19]
+    end else begin
+      counters_6 <= _counters_6_T_1; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 32:19]
+    end
+    if (reset) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+      counters_7 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 20:25]
+    end else if (sync1[7] == stable_7) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 26:34]
+      counters_7 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 27:19]
+    end else if (counters_7 == 20'hf423f) begin // @[src/main/scala/rvsoc/ButtonDebouncer.scala 28:70]
+      counters_7 <= 20'h0; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 30:19]
+    end else begin
+      counters_7 <= _counters_7_T_1; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 32:19]
+    end
+    stable_0 <= reset | _GEN_3; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:{23,23}]
+    stable_1 <= reset | _GEN_7; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:{23,23}]
+    stable_2 <= reset | _GEN_11; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:{23,23}]
+    stable_3 <= reset | _GEN_15; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:{23,23}]
+    stable_4 <= reset | _GEN_19; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:{23,23}]
+    stable_5 <= reset | _GEN_23; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:{23,23}]
+    stable_6 <= reset | _GEN_27; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:{23,23}]
+    stable_7 <= reset | _GEN_31; // @[src/main/scala/rvsoc/ButtonDebouncer.scala 21:{23,23}]
+  end
+// Register and memory initialization
+`ifdef RANDOMIZE_GARBAGE_ASSIGN
+`define RANDOMIZE
+`endif
+`ifdef RANDOMIZE_INVALID_ASSIGN
+`define RANDOMIZE
+`endif
+`ifdef RANDOMIZE_REG_INIT
+`define RANDOMIZE
+`endif
+`ifdef RANDOMIZE_MEM_INIT
+`define RANDOMIZE
+`endif
+`ifndef RANDOM
+`define RANDOM $random
+`endif
+`ifdef RANDOMIZE_MEM_INIT
+  integer initvar;
+`endif
+`ifndef SYNTHESIS
+`ifdef FIRRTL_BEFORE_INITIAL
+`FIRRTL_BEFORE_INITIAL
+`endif
+initial begin
+  `ifdef RANDOMIZE
+    `ifdef INIT_RANDOM
+      `INIT_RANDOM
+    `endif
+    `ifndef VERILATOR
+      `ifdef RANDOMIZE_DELAY
+        #`RANDOMIZE_DELAY begin end
+      `else
+        #0.002 begin end
+      `endif
+    `endif
+`ifdef RANDOMIZE_REG_INIT
+  _RAND_0 = {1{`RANDOM}};
+  sync0 = _RAND_0[7:0];
+  _RAND_1 = {1{`RANDOM}};
+  sync1 = _RAND_1[7:0];
+  _RAND_2 = {1{`RANDOM}};
+  counters_0 = _RAND_2[19:0];
+  _RAND_3 = {1{`RANDOM}};
+  counters_1 = _RAND_3[19:0];
+  _RAND_4 = {1{`RANDOM}};
+  counters_2 = _RAND_4[19:0];
+  _RAND_5 = {1{`RANDOM}};
+  counters_3 = _RAND_5[19:0];
+  _RAND_6 = {1{`RANDOM}};
+  counters_4 = _RAND_6[19:0];
+  _RAND_7 = {1{`RANDOM}};
+  counters_5 = _RAND_7[19:0];
+  _RAND_8 = {1{`RANDOM}};
+  counters_6 = _RAND_8[19:0];
+  _RAND_9 = {1{`RANDOM}};
+  counters_7 = _RAND_9[19:0];
+  _RAND_10 = {1{`RANDOM}};
+  stable_0 = _RAND_10[0:0];
+  _RAND_11 = {1{`RANDOM}};
+  stable_1 = _RAND_11[0:0];
+  _RAND_12 = {1{`RANDOM}};
+  stable_2 = _RAND_12[0:0];
+  _RAND_13 = {1{`RANDOM}};
+  stable_3 = _RAND_13[0:0];
+  _RAND_14 = {1{`RANDOM}};
+  stable_4 = _RAND_14[0:0];
+  _RAND_15 = {1{`RANDOM}};
+  stable_5 = _RAND_15[0:0];
+  _RAND_16 = {1{`RANDOM}};
+  stable_6 = _RAND_16[0:0];
+  _RAND_17 = {1{`RANDOM}};
+  stable_7 = _RAND_17[0:0];
+`endif // RANDOMIZE_REG_INIT
+  `endif // RANDOMIZE
+end // initial
+`ifdef FIRRTL_AFTER_INITIAL
+`FIRRTL_AFTER_INITIAL
+`endif
+`endif // SYNTHESIS
+endmodule
 module RustSoCTop(
   input        clock,
   input        reset,
@@ -1958,15 +2376,31 @@ module RustSoCTop(
   wire  uartRx_io_channel_ready; // @[src/main/scala/rvsoc/RustSoCTop.scala 265:49]
   wire  uartRx_io_channel_valid; // @[src/main/scala/rvsoc/RustSoCTop.scala 265:49]
   wire [7:0] uartRx_io_channel_bits; // @[src/main/scala/rvsoc/RustSoCTop.scala 265:49]
-  wire [7:0] bufJA_dir; // @[src/main/scala/rvsoc/RustSoCTop.scala 285:21]
-  wire [7:0] bufJA_out; // @[src/main/scala/rvsoc/RustSoCTop.scala 285:21]
-  wire [7:0] bufJA_in; // @[src/main/scala/rvsoc/RustSoCTop.scala 285:21]
-  wire [7:0] bufJB_dir; // @[src/main/scala/rvsoc/RustSoCTop.scala 300:21]
-  wire [7:0] bufJB_out; // @[src/main/scala/rvsoc/RustSoCTop.scala 300:21]
-  wire [7:0] bufJB_in; // @[src/main/scala/rvsoc/RustSoCTop.scala 300:21]
-  wire [7:0] bufJC_dir; // @[src/main/scala/rvsoc/RustSoCTop.scala 315:21]
-  wire [7:0] bufJC_out; // @[src/main/scala/rvsoc/RustSoCTop.scala 315:21]
-  wire [7:0] bufJC_in; // @[src/main/scala/rvsoc/RustSoCTop.scala 315:21]
+  wire  btnDebouncer_clock; // @[src/main/scala/rvsoc/RustSoCTop.scala 282:55]
+  wire  btnDebouncer_reset; // @[src/main/scala/rvsoc/RustSoCTop.scala 282:55]
+  wire [3:0] btnDebouncer_io_in; // @[src/main/scala/rvsoc/RustSoCTop.scala 282:55]
+  wire [3:0] btnDebouncer_io_out; // @[src/main/scala/rvsoc/RustSoCTop.scala 282:55]
+  wire [7:0] bufJA_dir; // @[src/main/scala/rvsoc/RustSoCTop.scala 294:21]
+  wire [7:0] bufJA_out; // @[src/main/scala/rvsoc/RustSoCTop.scala 294:21]
+  wire [7:0] bufJA_in; // @[src/main/scala/rvsoc/RustSoCTop.scala 294:21]
+  wire  gpioJADebouncer_clock; // @[src/main/scala/rvsoc/RustSoCTop.scala 303:58]
+  wire  gpioJADebouncer_reset; // @[src/main/scala/rvsoc/RustSoCTop.scala 303:58]
+  wire [7:0] gpioJADebouncer_io_in; // @[src/main/scala/rvsoc/RustSoCTop.scala 303:58]
+  wire [7:0] gpioJADebouncer_io_out; // @[src/main/scala/rvsoc/RustSoCTop.scala 303:58]
+  wire [7:0] bufJB_dir; // @[src/main/scala/rvsoc/RustSoCTop.scala 313:21]
+  wire [7:0] bufJB_out; // @[src/main/scala/rvsoc/RustSoCTop.scala 313:21]
+  wire [7:0] bufJB_in; // @[src/main/scala/rvsoc/RustSoCTop.scala 313:21]
+  wire  gpioJBDebouncer_clock; // @[src/main/scala/rvsoc/RustSoCTop.scala 322:58]
+  wire  gpioJBDebouncer_reset; // @[src/main/scala/rvsoc/RustSoCTop.scala 322:58]
+  wire [7:0] gpioJBDebouncer_io_in; // @[src/main/scala/rvsoc/RustSoCTop.scala 322:58]
+  wire [7:0] gpioJBDebouncer_io_out; // @[src/main/scala/rvsoc/RustSoCTop.scala 322:58]
+  wire [7:0] bufJC_dir; // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
+  wire [7:0] bufJC_out; // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
+  wire [7:0] bufJC_in; // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
+  wire  gpioJCDebouncer_clock; // @[src/main/scala/rvsoc/RustSoCTop.scala 341:58]
+  wire  gpioJCDebouncer_reset; // @[src/main/scala/rvsoc/RustSoCTop.scala 341:58]
+  wire [7:0] gpioJCDebouncer_io_in; // @[src/main/scala/rvsoc/RustSoCTop.scala 341:58]
+  wire [7:0] gpioJCDebouncer_io_out; // @[src/main/scala/rvsoc/RustSoCTop.scala 341:58]
   reg [31:0] resetShift; // @[src/main/scala/rvsoc/RustSoCTop.scala 117:27]
   wire [31:0] _resetShift_T_1 = {resetRx_io_channel_bits,resetShift[31:8]}; // @[src/main/scala/rvsoc/RustSoCTop.scala 119:43]
   wire  softReset = resetShift == 32'hdeadbeef; // @[src/main/scala/rvsoc/RustSoCTop.scala 123:19]
@@ -2018,212 +2452,219 @@ module RustSoCTop(
   reg [7:0] pwmDutyRegs_21; // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
   reg [7:0] pwmDutyRegs_22; // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
   reg [7:0] pwmDutyRegs_23; // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
-  reg [7:0] gpioJADirReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 281:56]
-  reg [7:0] gpioJAOutReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 282:56]
-  reg [7:0] gpioJAPwmEn; // @[src/main/scala/rvsoc/RustSoCTop.scala 284:56]
-  wire  finalJAOut_0 = gpioJAPwmEn[0] ? pwm_io_pwmOut[0] : gpioJAOutReg[0]; // @[src/main/scala/rvsoc/RustSoCTop.scala 290:25]
-  wire  finalJAOut_1 = gpioJAPwmEn[1] ? pwm_io_pwmOut[1] : gpioJAOutReg[1]; // @[src/main/scala/rvsoc/RustSoCTop.scala 290:25]
-  wire  finalJAOut_2 = gpioJAPwmEn[2] ? pwm_io_pwmOut[2] : gpioJAOutReg[2]; // @[src/main/scala/rvsoc/RustSoCTop.scala 290:25]
-  wire  finalJAOut_3 = gpioJAPwmEn[3] ? pwm_io_pwmOut[3] : gpioJAOutReg[3]; // @[src/main/scala/rvsoc/RustSoCTop.scala 290:25]
-  wire  finalJAOut_4 = gpioJAPwmEn[4] ? pwm_io_pwmOut[4] : gpioJAOutReg[4]; // @[src/main/scala/rvsoc/RustSoCTop.scala 290:25]
-  wire  finalJAOut_5 = gpioJAPwmEn[5] ? pwm_io_pwmOut[5] : gpioJAOutReg[5]; // @[src/main/scala/rvsoc/RustSoCTop.scala 290:25]
-  wire  finalJAOut_6 = gpioJAPwmEn[6] ? pwm_io_pwmOut[6] : gpioJAOutReg[6]; // @[src/main/scala/rvsoc/RustSoCTop.scala 290:25]
-  wire  finalJAOut_7 = gpioJAPwmEn[7] ? pwm_io_pwmOut[7] : gpioJAOutReg[7]; // @[src/main/scala/rvsoc/RustSoCTop.scala 290:25]
-  wire [3:0] bufJA_io_out_lo = {finalJAOut_3,finalJAOut_2,finalJAOut_1,finalJAOut_0}; // @[src/main/scala/rvsoc/RustSoCTop.scala 292:30]
-  wire [3:0] bufJA_io_out_hi = {finalJAOut_7,finalJAOut_6,finalJAOut_5,finalJAOut_4}; // @[src/main/scala/rvsoc/RustSoCTop.scala 292:30]
-  reg [7:0] gpioJBDirReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 296:56]
-  reg [7:0] gpioJBOutReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 297:56]
-  reg [7:0] gpioJBPwmEn; // @[src/main/scala/rvsoc/RustSoCTop.scala 299:56]
-  wire  finalJBOut_0 = gpioJBPwmEn[0] ? pwm_io_pwmOut[8] : gpioJBOutReg[0]; // @[src/main/scala/rvsoc/RustSoCTop.scala 305:25]
-  wire  finalJBOut_1 = gpioJBPwmEn[1] ? pwm_io_pwmOut[9] : gpioJBOutReg[1]; // @[src/main/scala/rvsoc/RustSoCTop.scala 305:25]
-  wire  finalJBOut_2 = gpioJBPwmEn[2] ? pwm_io_pwmOut[10] : gpioJBOutReg[2]; // @[src/main/scala/rvsoc/RustSoCTop.scala 305:25]
-  wire  finalJBOut_3 = gpioJBPwmEn[3] ? pwm_io_pwmOut[11] : gpioJBOutReg[3]; // @[src/main/scala/rvsoc/RustSoCTop.scala 305:25]
-  wire  finalJBOut_4 = gpioJBPwmEn[4] ? pwm_io_pwmOut[12] : gpioJBOutReg[4]; // @[src/main/scala/rvsoc/RustSoCTop.scala 305:25]
-  wire  finalJBOut_5 = gpioJBPwmEn[5] ? pwm_io_pwmOut[13] : gpioJBOutReg[5]; // @[src/main/scala/rvsoc/RustSoCTop.scala 305:25]
-  wire  finalJBOut_6 = gpioJBPwmEn[6] ? pwm_io_pwmOut[14] : gpioJBOutReg[6]; // @[src/main/scala/rvsoc/RustSoCTop.scala 305:25]
-  wire  finalJBOut_7 = gpioJBPwmEn[7] ? pwm_io_pwmOut[15] : gpioJBOutReg[7]; // @[src/main/scala/rvsoc/RustSoCTop.scala 305:25]
-  wire [3:0] bufJB_io_out_lo = {finalJBOut_3,finalJBOut_2,finalJBOut_1,finalJBOut_0}; // @[src/main/scala/rvsoc/RustSoCTop.scala 307:30]
-  wire [3:0] bufJB_io_out_hi = {finalJBOut_7,finalJBOut_6,finalJBOut_5,finalJBOut_4}; // @[src/main/scala/rvsoc/RustSoCTop.scala 307:30]
-  reg [7:0] gpioJCDirReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 311:56]
-  reg [7:0] gpioJCOutReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 312:56]
-  reg [7:0] gpioJCPwmEn; // @[src/main/scala/rvsoc/RustSoCTop.scala 314:56]
-  wire  finalJCOut_0 = gpioJCPwmEn[0] ? pwm_io_pwmOut[16] : gpioJCOutReg[0]; // @[src/main/scala/rvsoc/RustSoCTop.scala 320:25]
-  wire  finalJCOut_1 = gpioJCPwmEn[1] ? pwm_io_pwmOut[17] : gpioJCOutReg[1]; // @[src/main/scala/rvsoc/RustSoCTop.scala 320:25]
-  wire  finalJCOut_2 = gpioJCPwmEn[2] ? pwm_io_pwmOut[18] : gpioJCOutReg[2]; // @[src/main/scala/rvsoc/RustSoCTop.scala 320:25]
-  wire  finalJCOut_3 = gpioJCPwmEn[3] ? pwm_io_pwmOut[19] : gpioJCOutReg[3]; // @[src/main/scala/rvsoc/RustSoCTop.scala 320:25]
-  wire  finalJCOut_4 = gpioJCPwmEn[4] ? pwm_io_pwmOut[20] : gpioJCOutReg[4]; // @[src/main/scala/rvsoc/RustSoCTop.scala 320:25]
-  wire  finalJCOut_5 = gpioJCPwmEn[5] ? pwm_io_pwmOut[21] : gpioJCOutReg[5]; // @[src/main/scala/rvsoc/RustSoCTop.scala 320:25]
-  wire  finalJCOut_6 = gpioJCPwmEn[6] ? pwm_io_pwmOut[22] : gpioJCOutReg[6]; // @[src/main/scala/rvsoc/RustSoCTop.scala 320:25]
-  wire  finalJCOut_7 = gpioJCPwmEn[7] ? pwm_io_pwmOut[23] : gpioJCOutReg[7]; // @[src/main/scala/rvsoc/RustSoCTop.scala 320:25]
-  wire [3:0] bufJC_io_out_lo = {finalJCOut_3,finalJCOut_2,finalJCOut_1,finalJCOut_0}; // @[src/main/scala/rvsoc/RustSoCTop.scala 322:30]
-  wire [3:0] bufJC_io_out_hi = {finalJCOut_7,finalJCOut_6,finalJCOut_5,finalJCOut_4}; // @[src/main/scala/rvsoc/RustSoCTop.scala 322:30]
-  reg [6:0] ledReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 328:50]
-  wire  _isMMIOWrite_T_2 = cpuRunning & cpu_io_dmem_address[31:28] == 4'hf; // @[src/main/scala/rvsoc/RustSoCTop.scala 331:32]
-  wire  isMMIOWrite = cpuRunning & cpu_io_dmem_address[31:28] == 4'hf & cpu_io_dmem_wr; // @[src/main/scala/rvsoc/RustSoCTop.scala 331:75]
-  wire [3:0] modSel = cpu_io_dmem_address[23:20]; // @[src/main/scala/rvsoc/RustSoCTop.scala 333:37]
-  wire [7:0] offset = cpu_io_dmem_address[7:0]; // @[src/main/scala/rvsoc/RustSoCTop.scala 334:37]
-  wire  _T_9 = offset == 8'h4; // @[src/main/scala/rvsoc/RustSoCTop.scala 338:21]
-  wire  _T_11 = offset == 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 341:21]
-  wire [6:0] _GEN_34 = offset == 8'h0 ? cpu_io_dmem_wrData[6:0] : ledReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 341:{30,39} 328:50]
-  wire [15:0] _GEN_35 = _T_11 ? cpu_io_dmem_wrData[15:0] : pwmEnable; // @[src/main/scala/rvsoc/RustSoCTop.scala 344:{30,42} 252:53]
-  wire [7:0] _GEN_36 = _T_9 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_0; // @[src/main/scala/rvsoc/RustSoCTop.scala 346:44 253:55 346:61]
-  wire [7:0] _GEN_37 = offset == 8'h8 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_1; // @[src/main/scala/rvsoc/RustSoCTop.scala 346:44 253:55 346:61]
-  wire  _T_16 = offset == 8'hc; // @[src/main/scala/rvsoc/RustSoCTop.scala 346:23]
-  wire [7:0] _GEN_38 = offset == 8'hc ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_2; // @[src/main/scala/rvsoc/RustSoCTop.scala 346:44 253:55 346:61]
-  wire [7:0] _GEN_39 = offset == 8'h10 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_3; // @[src/main/scala/rvsoc/RustSoCTop.scala 346:44 253:55 346:61]
-  wire [7:0] _GEN_40 = offset == 8'h14 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_4; // @[src/main/scala/rvsoc/RustSoCTop.scala 346:44 253:55 346:61]
-  wire [7:0] _GEN_41 = offset == 8'h18 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_5; // @[src/main/scala/rvsoc/RustSoCTop.scala 346:44 253:55 346:61]
-  wire [7:0] _GEN_42 = offset == 8'h1c ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_6; // @[src/main/scala/rvsoc/RustSoCTop.scala 346:44 253:55 346:61]
-  wire [7:0] _GEN_43 = offset == 8'h20 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_7; // @[src/main/scala/rvsoc/RustSoCTop.scala 346:44 253:55 346:61]
-  wire [7:0] _GEN_44 = offset == 8'h24 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_8; // @[src/main/scala/rvsoc/RustSoCTop.scala 346:44 253:55 346:61]
-  wire [7:0] _GEN_45 = offset == 8'h28 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_9; // @[src/main/scala/rvsoc/RustSoCTop.scala 346:44 253:55 346:61]
-  wire [7:0] _GEN_46 = offset == 8'h2c ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_10; // @[src/main/scala/rvsoc/RustSoCTop.scala 346:44 253:55 346:61]
-  wire [7:0] _GEN_47 = offset == 8'h30 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_11; // @[src/main/scala/rvsoc/RustSoCTop.scala 346:44 253:55 346:61]
-  wire [7:0] _GEN_48 = offset == 8'h34 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_12; // @[src/main/scala/rvsoc/RustSoCTop.scala 346:44 253:55 346:61]
-  wire [7:0] _GEN_49 = offset == 8'h38 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_13; // @[src/main/scala/rvsoc/RustSoCTop.scala 346:44 253:55 346:61]
-  wire [7:0] _GEN_50 = offset == 8'h3c ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_14; // @[src/main/scala/rvsoc/RustSoCTop.scala 346:44 253:55 346:61]
-  wire [7:0] _GEN_51 = offset == 8'h40 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_15; // @[src/main/scala/rvsoc/RustSoCTop.scala 346:44 253:55 346:61]
-  wire [7:0] _GEN_52 = offset == 8'h44 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_16; // @[src/main/scala/rvsoc/RustSoCTop.scala 346:44 253:55 346:61]
-  wire [7:0] _GEN_53 = offset == 8'h48 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_17; // @[src/main/scala/rvsoc/RustSoCTop.scala 346:44 253:55 346:61]
-  wire [7:0] _GEN_54 = offset == 8'h4c ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_18; // @[src/main/scala/rvsoc/RustSoCTop.scala 346:44 253:55 346:61]
-  wire [7:0] _GEN_55 = offset == 8'h50 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_19; // @[src/main/scala/rvsoc/RustSoCTop.scala 346:44 253:55 346:61]
-  wire [7:0] _GEN_56 = offset == 8'h54 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_20; // @[src/main/scala/rvsoc/RustSoCTop.scala 346:44 253:55 346:61]
-  wire [7:0] _GEN_57 = offset == 8'h58 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_21; // @[src/main/scala/rvsoc/RustSoCTop.scala 346:44 253:55 346:61]
-  wire [7:0] _GEN_58 = offset == 8'h5c ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_22; // @[src/main/scala/rvsoc/RustSoCTop.scala 346:44 253:55 346:61]
-  wire [7:0] _GEN_59 = offset == 8'h60 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_23; // @[src/main/scala/rvsoc/RustSoCTop.scala 346:44 253:55 346:61]
-  wire [7:0] _GEN_60 = _T_16 ? cpu_io_dmem_wrData[7:0] : gpioJAPwmEn; // @[src/main/scala/rvsoc/RustSoCTop.scala 352:{36,50} 284:56]
-  wire [7:0] _GEN_61 = _T_9 ? cpu_io_dmem_wrData[7:0] : gpioJAOutReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 351:{35,50} 282:56]
-  wire [7:0] _GEN_62 = _T_9 ? gpioJAPwmEn : _GEN_60; // @[src/main/scala/rvsoc/RustSoCTop.scala 351:35 284:56]
-  wire [7:0] _GEN_63 = _T_11 ? cpu_io_dmem_wrData[7:0] : gpioJADirReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 350:{30,45} 281:56]
-  wire [7:0] _GEN_64 = _T_11 ? gpioJAOutReg : _GEN_61; // @[src/main/scala/rvsoc/RustSoCTop.scala 350:30 282:56]
-  wire [7:0] _GEN_65 = _T_11 ? gpioJAPwmEn : _GEN_62; // @[src/main/scala/rvsoc/RustSoCTop.scala 350:30 284:56]
-  wire [7:0] _GEN_66 = _T_16 ? cpu_io_dmem_wrData[7:0] : gpioJBPwmEn; // @[src/main/scala/rvsoc/RustSoCTop.scala 357:{36,50} 299:56]
-  wire [7:0] _GEN_67 = _T_9 ? cpu_io_dmem_wrData[7:0] : gpioJBOutReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:{35,50} 297:56]
-  wire [7:0] _GEN_68 = _T_9 ? gpioJBPwmEn : _GEN_66; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:35 299:56]
-  wire [7:0] _GEN_69 = _T_11 ? cpu_io_dmem_wrData[7:0] : gpioJBDirReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 355:{30,45} 296:56]
-  wire [7:0] _GEN_70 = _T_11 ? gpioJBOutReg : _GEN_67; // @[src/main/scala/rvsoc/RustSoCTop.scala 355:30 297:56]
-  wire [7:0] _GEN_71 = _T_11 ? gpioJBPwmEn : _GEN_68; // @[src/main/scala/rvsoc/RustSoCTop.scala 355:30 299:56]
-  wire [7:0] _GEN_72 = _T_16 ? cpu_io_dmem_wrData[7:0] : gpioJCPwmEn; // @[src/main/scala/rvsoc/RustSoCTop.scala 362:{36,50} 314:56]
-  wire [7:0] _GEN_73 = _T_9 ? cpu_io_dmem_wrData[7:0] : gpioJCOutReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 361:{35,50} 312:56]
-  wire [7:0] _GEN_74 = _T_9 ? gpioJCPwmEn : _GEN_72; // @[src/main/scala/rvsoc/RustSoCTop.scala 361:35 314:56]
-  wire [7:0] _GEN_75 = _T_11 ? cpu_io_dmem_wrData[7:0] : gpioJCDirReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 360:{30,45} 311:56]
-  wire [7:0] _GEN_76 = _T_11 ? gpioJCOutReg : _GEN_73; // @[src/main/scala/rvsoc/RustSoCTop.scala 360:30 312:56]
-  wire [7:0] _GEN_77 = _T_11 ? gpioJCPwmEn : _GEN_74; // @[src/main/scala/rvsoc/RustSoCTop.scala 360:30 314:56]
-  wire [7:0] _GEN_78 = 4'h7 == modSel ? _GEN_75 : gpioJCDirReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 311:56]
-  wire [7:0] _GEN_79 = 4'h7 == modSel ? _GEN_76 : gpioJCOutReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 312:56]
-  wire [7:0] _GEN_80 = 4'h7 == modSel ? _GEN_77 : gpioJCPwmEn; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 314:56]
-  wire [7:0] _GEN_81 = 4'h6 == modSel ? _GEN_69 : gpioJBDirReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 296:56]
-  wire [7:0] _GEN_82 = 4'h6 == modSel ? _GEN_70 : gpioJBOutReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 297:56]
-  wire [7:0] _GEN_83 = 4'h6 == modSel ? _GEN_71 : gpioJBPwmEn; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 299:56]
-  wire [7:0] _GEN_84 = 4'h6 == modSel ? gpioJCDirReg : _GEN_78; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 311:56]
-  wire [7:0] _GEN_85 = 4'h6 == modSel ? gpioJCOutReg : _GEN_79; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 312:56]
-  wire [7:0] _GEN_86 = 4'h6 == modSel ? gpioJCPwmEn : _GEN_80; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 314:56]
-  wire [7:0] _GEN_87 = 4'h5 == modSel ? _GEN_63 : gpioJADirReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 281:56]
-  wire [7:0] _GEN_88 = 4'h5 == modSel ? _GEN_64 : gpioJAOutReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 282:56]
-  wire [7:0] _GEN_89 = 4'h5 == modSel ? _GEN_65 : gpioJAPwmEn; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 284:56]
-  wire [7:0] _GEN_90 = 4'h5 == modSel ? gpioJBDirReg : _GEN_81; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 296:56]
-  wire [7:0] _GEN_91 = 4'h5 == modSel ? gpioJBOutReg : _GEN_82; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 297:56]
-  wire [7:0] _GEN_92 = 4'h5 == modSel ? gpioJBPwmEn : _GEN_83; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 299:56]
-  wire [7:0] _GEN_93 = 4'h5 == modSel ? gpioJCDirReg : _GEN_84; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 311:56]
-  wire [7:0] _GEN_94 = 4'h5 == modSel ? gpioJCOutReg : _GEN_85; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 312:56]
-  wire [7:0] _GEN_95 = 4'h5 == modSel ? gpioJCPwmEn : _GEN_86; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 314:56]
-  wire [15:0] _GEN_96 = 4'h4 == modSel ? _GEN_35 : pwmEnable; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 252:53]
-  wire [7:0] _GEN_97 = 4'h4 == modSel ? _GEN_36 : pwmDutyRegs_0; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 253:55]
-  wire [7:0] _GEN_98 = 4'h4 == modSel ? _GEN_37 : pwmDutyRegs_1; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 253:55]
-  wire [7:0] _GEN_99 = 4'h4 == modSel ? _GEN_38 : pwmDutyRegs_2; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 253:55]
-  wire [7:0] _GEN_100 = 4'h4 == modSel ? _GEN_39 : pwmDutyRegs_3; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 253:55]
-  wire [7:0] _GEN_101 = 4'h4 == modSel ? _GEN_40 : pwmDutyRegs_4; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 253:55]
-  wire [7:0] _GEN_102 = 4'h4 == modSel ? _GEN_41 : pwmDutyRegs_5; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 253:55]
-  wire [7:0] _GEN_103 = 4'h4 == modSel ? _GEN_42 : pwmDutyRegs_6; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 253:55]
-  wire [7:0] _GEN_104 = 4'h4 == modSel ? _GEN_43 : pwmDutyRegs_7; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 253:55]
-  wire [7:0] _GEN_105 = 4'h4 == modSel ? _GEN_44 : pwmDutyRegs_8; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 253:55]
-  wire [7:0] _GEN_106 = 4'h4 == modSel ? _GEN_45 : pwmDutyRegs_9; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 253:55]
-  wire [7:0] _GEN_107 = 4'h4 == modSel ? _GEN_46 : pwmDutyRegs_10; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 253:55]
-  wire [7:0] _GEN_108 = 4'h4 == modSel ? _GEN_47 : pwmDutyRegs_11; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 253:55]
-  wire [7:0] _GEN_109 = 4'h4 == modSel ? _GEN_48 : pwmDutyRegs_12; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 253:55]
-  wire [7:0] _GEN_110 = 4'h4 == modSel ? _GEN_49 : pwmDutyRegs_13; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 253:55]
-  wire [7:0] _GEN_111 = 4'h4 == modSel ? _GEN_50 : pwmDutyRegs_14; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 253:55]
-  wire [7:0] _GEN_112 = 4'h4 == modSel ? _GEN_51 : pwmDutyRegs_15; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 253:55]
-  wire [7:0] _GEN_113 = 4'h4 == modSel ? _GEN_52 : pwmDutyRegs_16; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 253:55]
-  wire [7:0] _GEN_114 = 4'h4 == modSel ? _GEN_53 : pwmDutyRegs_17; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 253:55]
-  wire [7:0] _GEN_115 = 4'h4 == modSel ? _GEN_54 : pwmDutyRegs_18; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 253:55]
-  wire [7:0] _GEN_116 = 4'h4 == modSel ? _GEN_55 : pwmDutyRegs_19; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 253:55]
-  wire [7:0] _GEN_117 = 4'h4 == modSel ? _GEN_56 : pwmDutyRegs_20; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 253:55]
-  wire [7:0] _GEN_118 = 4'h4 == modSel ? _GEN_57 : pwmDutyRegs_21; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 253:55]
-  wire [7:0] _GEN_119 = 4'h4 == modSel ? _GEN_58 : pwmDutyRegs_22; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 253:55]
-  wire [7:0] _GEN_120 = 4'h4 == modSel ? _GEN_59 : pwmDutyRegs_23; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 253:55]
-  wire [7:0] _GEN_121 = 4'h4 == modSel ? gpioJADirReg : _GEN_87; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 281:56]
-  wire [7:0] _GEN_122 = 4'h4 == modSel ? gpioJAOutReg : _GEN_88; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 282:56]
-  wire [7:0] _GEN_123 = 4'h4 == modSel ? gpioJAPwmEn : _GEN_89; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 284:56]
-  wire [7:0] _GEN_124 = 4'h4 == modSel ? gpioJBDirReg : _GEN_90; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 296:56]
-  wire [7:0] _GEN_125 = 4'h4 == modSel ? gpioJBOutReg : _GEN_91; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 297:56]
-  wire [7:0] _GEN_126 = 4'h4 == modSel ? gpioJBPwmEn : _GEN_92; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 299:56]
-  wire [7:0] _GEN_127 = 4'h4 == modSel ? gpioJCDirReg : _GEN_93; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 311:56]
-  wire [7:0] _GEN_128 = 4'h4 == modSel ? gpioJCOutReg : _GEN_94; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 312:56]
-  wire [7:0] _GEN_129 = 4'h4 == modSel ? gpioJCPwmEn : _GEN_95; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 314:56]
-  wire  _GEN_165 = 4'h0 == modSel & _T_9; // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20 274:27]
-  reg [31:0] memAddressReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 369:30]
-  wire  isMMIORead = cpuRunning & memAddressReg[31:28] == 4'hf; // @[src/main/scala/rvsoc/RustSoCTop.scala 370:31]
-  wire [3:0] modSel_1 = memAddressReg[23:20]; // @[src/main/scala/rvsoc/RustSoCTop.scala 373:31]
-  wire [7:0] offset_1 = memAddressReg[7:0]; // @[src/main/scala/rvsoc/RustSoCTop.scala 374:31]
-  wire  _T_51 = offset_1 == 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 378:21]
-  reg [1:0] cpu_io_dmem_rdData_REG; // @[src/main/scala/rvsoc/RustSoCTop.scala 378:61]
-  wire  _T_52 = offset_1 == 8'h4; // @[src/main/scala/rvsoc/RustSoCTop.scala 379:26]
-  wire [31:0] _GEN_238 = offset_1 == 8'h4 ? {{24'd0}, uartRx_io_channel_bits} : _GEN_31; // @[src/main/scala/rvsoc/RustSoCTop.scala 379:{35,56}]
-  wire [31:0] _GEN_239 = offset_1 == 8'h0 ? {{30'd0}, cpu_io_dmem_rdData_REG} : _GEN_238; // @[src/main/scala/rvsoc/RustSoCTop.scala 378:{30,51}]
-  wire  _T_57 = offset_1 == 8'h8; // @[src/main/scala/rvsoc/RustSoCTop.scala 385:26]
-  wire  _T_58 = offset_1 == 8'hc; // @[src/main/scala/rvsoc/RustSoCTop.scala 386:26]
-  wire [31:0] _GEN_240 = offset_1 == 8'hc ? {{16'd0}, adc_io_adcData3} : _GEN_31; // @[src/main/scala/rvsoc/RustSoCTop.scala 386:{36,57}]
-  wire [31:0] _GEN_241 = offset_1 == 8'h8 ? {{16'd0}, adc_io_adcData2} : _GEN_240; // @[src/main/scala/rvsoc/RustSoCTop.scala 385:{36,57}]
-  wire [31:0] _GEN_242 = _T_52 ? {{16'd0}, adc_io_adcData1} : _GEN_241; // @[src/main/scala/rvsoc/RustSoCTop.scala 384:{36,57}]
-  wire [31:0] _GEN_243 = _T_51 ? {{16'd0}, adc_io_adcData0} : _GEN_242; // @[src/main/scala/rvsoc/RustSoCTop.scala 383:{36,57}]
-  wire [31:0] _GEN_244 = _T_51 ? {{16'd0}, pwmEnable} : _GEN_31; // @[src/main/scala/rvsoc/RustSoCTop.scala 389:{30,51}]
-  wire [31:0] _GEN_245 = _T_52 ? {{24'd0}, pwmDutyRegs_0} : _GEN_244; // @[src/main/scala/rvsoc/RustSoCTop.scala 391:{44,65}]
-  wire [31:0] _GEN_246 = _T_57 ? {{24'd0}, pwmDutyRegs_1} : _GEN_245; // @[src/main/scala/rvsoc/RustSoCTop.scala 391:{44,65}]
-  wire [31:0] _GEN_247 = _T_58 ? {{24'd0}, pwmDutyRegs_2} : _GEN_246; // @[src/main/scala/rvsoc/RustSoCTop.scala 391:{44,65}]
-  wire [31:0] _GEN_248 = offset_1 == 8'h10 ? {{24'd0}, pwmDutyRegs_3} : _GEN_247; // @[src/main/scala/rvsoc/RustSoCTop.scala 391:{44,65}]
-  wire [31:0] _GEN_249 = offset_1 == 8'h14 ? {{24'd0}, pwmDutyRegs_4} : _GEN_248; // @[src/main/scala/rvsoc/RustSoCTop.scala 391:{44,65}]
-  wire [31:0] _GEN_250 = offset_1 == 8'h18 ? {{24'd0}, pwmDutyRegs_5} : _GEN_249; // @[src/main/scala/rvsoc/RustSoCTop.scala 391:{44,65}]
-  wire [31:0] _GEN_251 = offset_1 == 8'h1c ? {{24'd0}, pwmDutyRegs_6} : _GEN_250; // @[src/main/scala/rvsoc/RustSoCTop.scala 391:{44,65}]
-  wire [31:0] _GEN_252 = offset_1 == 8'h20 ? {{24'd0}, pwmDutyRegs_7} : _GEN_251; // @[src/main/scala/rvsoc/RustSoCTop.scala 391:{44,65}]
-  wire [31:0] _GEN_253 = offset_1 == 8'h24 ? {{24'd0}, pwmDutyRegs_8} : _GEN_252; // @[src/main/scala/rvsoc/RustSoCTop.scala 391:{44,65}]
-  wire [31:0] _GEN_254 = offset_1 == 8'h28 ? {{24'd0}, pwmDutyRegs_9} : _GEN_253; // @[src/main/scala/rvsoc/RustSoCTop.scala 391:{44,65}]
-  wire [31:0] _GEN_255 = offset_1 == 8'h2c ? {{24'd0}, pwmDutyRegs_10} : _GEN_254; // @[src/main/scala/rvsoc/RustSoCTop.scala 391:{44,65}]
-  wire [31:0] _GEN_256 = offset_1 == 8'h30 ? {{24'd0}, pwmDutyRegs_11} : _GEN_255; // @[src/main/scala/rvsoc/RustSoCTop.scala 391:{44,65}]
-  wire [31:0] _GEN_257 = offset_1 == 8'h34 ? {{24'd0}, pwmDutyRegs_12} : _GEN_256; // @[src/main/scala/rvsoc/RustSoCTop.scala 391:{44,65}]
-  wire [31:0] _GEN_258 = offset_1 == 8'h38 ? {{24'd0}, pwmDutyRegs_13} : _GEN_257; // @[src/main/scala/rvsoc/RustSoCTop.scala 391:{44,65}]
-  wire [31:0] _GEN_259 = offset_1 == 8'h3c ? {{24'd0}, pwmDutyRegs_14} : _GEN_258; // @[src/main/scala/rvsoc/RustSoCTop.scala 391:{44,65}]
-  wire [31:0] _GEN_260 = offset_1 == 8'h40 ? {{24'd0}, pwmDutyRegs_15} : _GEN_259; // @[src/main/scala/rvsoc/RustSoCTop.scala 391:{44,65}]
-  wire [31:0] _GEN_261 = offset_1 == 8'h44 ? {{24'd0}, pwmDutyRegs_16} : _GEN_260; // @[src/main/scala/rvsoc/RustSoCTop.scala 391:{44,65}]
-  wire [31:0] _GEN_262 = offset_1 == 8'h48 ? {{24'd0}, pwmDutyRegs_17} : _GEN_261; // @[src/main/scala/rvsoc/RustSoCTop.scala 391:{44,65}]
-  wire [31:0] _GEN_263 = offset_1 == 8'h4c ? {{24'd0}, pwmDutyRegs_18} : _GEN_262; // @[src/main/scala/rvsoc/RustSoCTop.scala 391:{44,65}]
-  wire [31:0] _GEN_264 = offset_1 == 8'h50 ? {{24'd0}, pwmDutyRegs_19} : _GEN_263; // @[src/main/scala/rvsoc/RustSoCTop.scala 391:{44,65}]
-  wire [31:0] _GEN_265 = offset_1 == 8'h54 ? {{24'd0}, pwmDutyRegs_20} : _GEN_264; // @[src/main/scala/rvsoc/RustSoCTop.scala 391:{44,65}]
-  wire [31:0] _GEN_266 = offset_1 == 8'h58 ? {{24'd0}, pwmDutyRegs_21} : _GEN_265; // @[src/main/scala/rvsoc/RustSoCTop.scala 391:{44,65}]
-  wire [31:0] _GEN_267 = offset_1 == 8'h5c ? {{24'd0}, pwmDutyRegs_22} : _GEN_266; // @[src/main/scala/rvsoc/RustSoCTop.scala 391:{44,65}]
-  wire [31:0] _GEN_268 = offset_1 == 8'h60 ? {{24'd0}, pwmDutyRegs_23} : _GEN_267; // @[src/main/scala/rvsoc/RustSoCTop.scala 391:{44,65}]
-  wire [31:0] _GEN_269 = _T_58 ? {{24'd0}, gpioJAPwmEn} : _GEN_31; // @[src/main/scala/rvsoc/RustSoCTop.scala 398:{36,57}]
-  wire [7:0] gpioJAIn = bufJA_in; // @[src/main/scala/rvsoc/RustSoCTop.scala 283:26 293:13]
-  wire [31:0] _GEN_270 = _T_57 ? {{24'd0}, gpioJAIn} : _GEN_269; // @[src/main/scala/rvsoc/RustSoCTop.scala 397:{36,57}]
-  wire [31:0] _GEN_271 = _T_52 ? {{24'd0}, gpioJAOutReg} : _GEN_270; // @[src/main/scala/rvsoc/RustSoCTop.scala 396:{36,57}]
-  wire [31:0] _GEN_272 = _T_51 ? {{24'd0}, gpioJADirReg} : _GEN_271; // @[src/main/scala/rvsoc/RustSoCTop.scala 395:{36,57}]
-  wire [31:0] _GEN_273 = _T_58 ? {{24'd0}, gpioJBPwmEn} : _GEN_31; // @[src/main/scala/rvsoc/RustSoCTop.scala 404:{36,57}]
-  wire [7:0] gpioJBIn = bufJB_in; // @[src/main/scala/rvsoc/RustSoCTop.scala 298:26 308:13]
-  wire [31:0] _GEN_274 = _T_57 ? {{24'd0}, gpioJBIn} : _GEN_273; // @[src/main/scala/rvsoc/RustSoCTop.scala 403:{36,57}]
-  wire [31:0] _GEN_275 = _T_52 ? {{24'd0}, gpioJBOutReg} : _GEN_274; // @[src/main/scala/rvsoc/RustSoCTop.scala 402:{36,57}]
-  wire [31:0] _GEN_276 = _T_51 ? {{24'd0}, gpioJBDirReg} : _GEN_275; // @[src/main/scala/rvsoc/RustSoCTop.scala 401:{36,57}]
-  wire [31:0] _GEN_277 = _T_58 ? {{24'd0}, gpioJCPwmEn} : _GEN_31; // @[src/main/scala/rvsoc/RustSoCTop.scala 410:{36,57}]
-  wire [7:0] gpioJCIn = bufJC_in; // @[src/main/scala/rvsoc/RustSoCTop.scala 313:26 323:13]
-  wire [31:0] _GEN_278 = _T_57 ? {{24'd0}, gpioJCIn} : _GEN_277; // @[src/main/scala/rvsoc/RustSoCTop.scala 409:{36,57}]
-  wire [31:0] _GEN_279 = _T_52 ? {{24'd0}, gpioJCOutReg} : _GEN_278; // @[src/main/scala/rvsoc/RustSoCTop.scala 408:{36,57}]
-  wire [31:0] _GEN_280 = _T_51 ? {{24'd0}, gpioJCDirReg} : _GEN_279; // @[src/main/scala/rvsoc/RustSoCTop.scala 407:{36,57}]
-  wire [31:0] _GEN_281 = 4'h7 == modSel_1 ? _GEN_280 : _GEN_31; // @[src/main/scala/rvsoc/RustSoCTop.scala 376:20]
-  wire [31:0] _GEN_282 = 4'h6 == modSel_1 ? _GEN_276 : _GEN_281; // @[src/main/scala/rvsoc/RustSoCTop.scala 376:20]
-  wire [31:0] _GEN_283 = 4'h5 == modSel_1 ? _GEN_272 : _GEN_282; // @[src/main/scala/rvsoc/RustSoCTop.scala 376:20]
-  wire [31:0] _GEN_284 = 4'h4 == modSel_1 ? _GEN_268 : _GEN_283; // @[src/main/scala/rvsoc/RustSoCTop.scala 376:20]
-  wire [31:0] _GEN_285 = 4'h3 == modSel_1 ? _GEN_243 : _GEN_284; // @[src/main/scala/rvsoc/RustSoCTop.scala 376:20]
-  wire [31:0] _GEN_286 = 4'h2 == modSel_1 ? {{28'd0}, io_btn} : _GEN_285; // @[src/main/scala/rvsoc/RustSoCTop.scala 376:20 381:36]
-  wire [31:0] _GEN_287 = 4'h0 == modSel_1 ? _GEN_239 : _GEN_286; // @[src/main/scala/rvsoc/RustSoCTop.scala 376:20]
+  reg [7:0] gpioJADirReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 289:56]
+  reg [7:0] gpioJAOutReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 290:56]
+  reg [7:0] gpioJAPwmEn; // @[src/main/scala/rvsoc/RustSoCTop.scala 292:56]
+  wire  finalJAOut_0 = gpioJAPwmEn[0] ? pwm_io_pwmOut[0] : gpioJAOutReg[0]; // @[src/main/scala/rvsoc/RustSoCTop.scala 299:25]
+  wire  finalJAOut_1 = gpioJAPwmEn[1] ? pwm_io_pwmOut[1] : gpioJAOutReg[1]; // @[src/main/scala/rvsoc/RustSoCTop.scala 299:25]
+  wire  finalJAOut_2 = gpioJAPwmEn[2] ? pwm_io_pwmOut[2] : gpioJAOutReg[2]; // @[src/main/scala/rvsoc/RustSoCTop.scala 299:25]
+  wire  finalJAOut_3 = gpioJAPwmEn[3] ? pwm_io_pwmOut[3] : gpioJAOutReg[3]; // @[src/main/scala/rvsoc/RustSoCTop.scala 299:25]
+  wire  finalJAOut_4 = gpioJAPwmEn[4] ? pwm_io_pwmOut[4] : gpioJAOutReg[4]; // @[src/main/scala/rvsoc/RustSoCTop.scala 299:25]
+  wire  finalJAOut_5 = gpioJAPwmEn[5] ? pwm_io_pwmOut[5] : gpioJAOutReg[5]; // @[src/main/scala/rvsoc/RustSoCTop.scala 299:25]
+  wire  finalJAOut_6 = gpioJAPwmEn[6] ? pwm_io_pwmOut[6] : gpioJAOutReg[6]; // @[src/main/scala/rvsoc/RustSoCTop.scala 299:25]
+  wire  finalJAOut_7 = gpioJAPwmEn[7] ? pwm_io_pwmOut[7] : gpioJAOutReg[7]; // @[src/main/scala/rvsoc/RustSoCTop.scala 299:25]
+  wire [3:0] bufJA_io_out_lo = {finalJAOut_3,finalJAOut_2,finalJAOut_1,finalJAOut_0}; // @[src/main/scala/rvsoc/RustSoCTop.scala 301:30]
+  wire [3:0] bufJA_io_out_hi = {finalJAOut_7,finalJAOut_6,finalJAOut_5,finalJAOut_4}; // @[src/main/scala/rvsoc/RustSoCTop.scala 301:30]
+  reg [7:0] gpioJBDirReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 308:56]
+  reg [7:0] gpioJBOutReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 309:56]
+  reg [7:0] gpioJBPwmEn; // @[src/main/scala/rvsoc/RustSoCTop.scala 311:56]
+  wire  finalJBOut_0 = gpioJBPwmEn[0] ? pwm_io_pwmOut[8] : gpioJBOutReg[0]; // @[src/main/scala/rvsoc/RustSoCTop.scala 318:25]
+  wire  finalJBOut_1 = gpioJBPwmEn[1] ? pwm_io_pwmOut[9] : gpioJBOutReg[1]; // @[src/main/scala/rvsoc/RustSoCTop.scala 318:25]
+  wire  finalJBOut_2 = gpioJBPwmEn[2] ? pwm_io_pwmOut[10] : gpioJBOutReg[2]; // @[src/main/scala/rvsoc/RustSoCTop.scala 318:25]
+  wire  finalJBOut_3 = gpioJBPwmEn[3] ? pwm_io_pwmOut[11] : gpioJBOutReg[3]; // @[src/main/scala/rvsoc/RustSoCTop.scala 318:25]
+  wire  finalJBOut_4 = gpioJBPwmEn[4] ? pwm_io_pwmOut[12] : gpioJBOutReg[4]; // @[src/main/scala/rvsoc/RustSoCTop.scala 318:25]
+  wire  finalJBOut_5 = gpioJBPwmEn[5] ? pwm_io_pwmOut[13] : gpioJBOutReg[5]; // @[src/main/scala/rvsoc/RustSoCTop.scala 318:25]
+  wire  finalJBOut_6 = gpioJBPwmEn[6] ? pwm_io_pwmOut[14] : gpioJBOutReg[6]; // @[src/main/scala/rvsoc/RustSoCTop.scala 318:25]
+  wire  finalJBOut_7 = gpioJBPwmEn[7] ? pwm_io_pwmOut[15] : gpioJBOutReg[7]; // @[src/main/scala/rvsoc/RustSoCTop.scala 318:25]
+  wire [3:0] bufJB_io_out_lo = {finalJBOut_3,finalJBOut_2,finalJBOut_1,finalJBOut_0}; // @[src/main/scala/rvsoc/RustSoCTop.scala 320:30]
+  wire [3:0] bufJB_io_out_hi = {finalJBOut_7,finalJBOut_6,finalJBOut_5,finalJBOut_4}; // @[src/main/scala/rvsoc/RustSoCTop.scala 320:30]
+  reg [7:0] gpioJCDirReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 327:56]
+  reg [7:0] gpioJCOutReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 328:56]
+  reg [7:0] gpioJCPwmEn; // @[src/main/scala/rvsoc/RustSoCTop.scala 330:56]
+  wire  finalJCOut_0 = gpioJCPwmEn[0] ? pwm_io_pwmOut[16] : gpioJCOutReg[0]; // @[src/main/scala/rvsoc/RustSoCTop.scala 337:25]
+  wire  finalJCOut_1 = gpioJCPwmEn[1] ? pwm_io_pwmOut[17] : gpioJCOutReg[1]; // @[src/main/scala/rvsoc/RustSoCTop.scala 337:25]
+  wire  finalJCOut_2 = gpioJCPwmEn[2] ? pwm_io_pwmOut[18] : gpioJCOutReg[2]; // @[src/main/scala/rvsoc/RustSoCTop.scala 337:25]
+  wire  finalJCOut_3 = gpioJCPwmEn[3] ? pwm_io_pwmOut[19] : gpioJCOutReg[3]; // @[src/main/scala/rvsoc/RustSoCTop.scala 337:25]
+  wire  finalJCOut_4 = gpioJCPwmEn[4] ? pwm_io_pwmOut[20] : gpioJCOutReg[4]; // @[src/main/scala/rvsoc/RustSoCTop.scala 337:25]
+  wire  finalJCOut_5 = gpioJCPwmEn[5] ? pwm_io_pwmOut[21] : gpioJCOutReg[5]; // @[src/main/scala/rvsoc/RustSoCTop.scala 337:25]
+  wire  finalJCOut_6 = gpioJCPwmEn[6] ? pwm_io_pwmOut[22] : gpioJCOutReg[6]; // @[src/main/scala/rvsoc/RustSoCTop.scala 337:25]
+  wire  finalJCOut_7 = gpioJCPwmEn[7] ? pwm_io_pwmOut[23] : gpioJCOutReg[7]; // @[src/main/scala/rvsoc/RustSoCTop.scala 337:25]
+  wire [3:0] bufJC_io_out_lo = {finalJCOut_3,finalJCOut_2,finalJCOut_1,finalJCOut_0}; // @[src/main/scala/rvsoc/RustSoCTop.scala 339:30]
+  wire [3:0] bufJC_io_out_hi = {finalJCOut_7,finalJCOut_6,finalJCOut_5,finalJCOut_4}; // @[src/main/scala/rvsoc/RustSoCTop.scala 339:30]
+  reg [6:0] ledReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 348:50]
+  wire  _isMMIOWrite_T_2 = cpuRunning & cpu_io_dmem_address[31:28] == 4'hf; // @[src/main/scala/rvsoc/RustSoCTop.scala 351:32]
+  wire  isMMIOWrite = cpuRunning & cpu_io_dmem_address[31:28] == 4'hf & cpu_io_dmem_wr; // @[src/main/scala/rvsoc/RustSoCTop.scala 351:75]
+  wire [3:0] modSel = cpu_io_dmem_address[23:20]; // @[src/main/scala/rvsoc/RustSoCTop.scala 353:37]
+  wire [7:0] offset = cpu_io_dmem_address[7:0]; // @[src/main/scala/rvsoc/RustSoCTop.scala 354:37]
+  wire  _T_9 = offset == 8'h4; // @[src/main/scala/rvsoc/RustSoCTop.scala 358:21]
+  wire  _T_11 = offset == 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 361:21]
+  wire [6:0] _GEN_34 = offset == 8'h0 ? cpu_io_dmem_wrData[6:0] : ledReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 361:{30,39} 348:50]
+  wire [15:0] _GEN_35 = _T_11 ? cpu_io_dmem_wrData[15:0] : pwmEnable; // @[src/main/scala/rvsoc/RustSoCTop.scala 364:{30,42} 252:53]
+  wire [7:0] _GEN_36 = _T_9 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_0; // @[src/main/scala/rvsoc/RustSoCTop.scala 366:44 253:55 366:61]
+  wire [7:0] _GEN_37 = offset == 8'h8 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_1; // @[src/main/scala/rvsoc/RustSoCTop.scala 366:44 253:55 366:61]
+  wire  _T_16 = offset == 8'hc; // @[src/main/scala/rvsoc/RustSoCTop.scala 366:23]
+  wire [7:0] _GEN_38 = offset == 8'hc ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_2; // @[src/main/scala/rvsoc/RustSoCTop.scala 366:44 253:55 366:61]
+  wire [7:0] _GEN_39 = offset == 8'h10 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_3; // @[src/main/scala/rvsoc/RustSoCTop.scala 366:44 253:55 366:61]
+  wire [7:0] _GEN_40 = offset == 8'h14 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_4; // @[src/main/scala/rvsoc/RustSoCTop.scala 366:44 253:55 366:61]
+  wire [7:0] _GEN_41 = offset == 8'h18 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_5; // @[src/main/scala/rvsoc/RustSoCTop.scala 366:44 253:55 366:61]
+  wire [7:0] _GEN_42 = offset == 8'h1c ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_6; // @[src/main/scala/rvsoc/RustSoCTop.scala 366:44 253:55 366:61]
+  wire [7:0] _GEN_43 = offset == 8'h20 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_7; // @[src/main/scala/rvsoc/RustSoCTop.scala 366:44 253:55 366:61]
+  wire [7:0] _GEN_44 = offset == 8'h24 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_8; // @[src/main/scala/rvsoc/RustSoCTop.scala 366:44 253:55 366:61]
+  wire [7:0] _GEN_45 = offset == 8'h28 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_9; // @[src/main/scala/rvsoc/RustSoCTop.scala 366:44 253:55 366:61]
+  wire [7:0] _GEN_46 = offset == 8'h2c ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_10; // @[src/main/scala/rvsoc/RustSoCTop.scala 366:44 253:55 366:61]
+  wire [7:0] _GEN_47 = offset == 8'h30 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_11; // @[src/main/scala/rvsoc/RustSoCTop.scala 366:44 253:55 366:61]
+  wire [7:0] _GEN_48 = offset == 8'h34 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_12; // @[src/main/scala/rvsoc/RustSoCTop.scala 366:44 253:55 366:61]
+  wire [7:0] _GEN_49 = offset == 8'h38 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_13; // @[src/main/scala/rvsoc/RustSoCTop.scala 366:44 253:55 366:61]
+  wire [7:0] _GEN_50 = offset == 8'h3c ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_14; // @[src/main/scala/rvsoc/RustSoCTop.scala 366:44 253:55 366:61]
+  wire [7:0] _GEN_51 = offset == 8'h40 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_15; // @[src/main/scala/rvsoc/RustSoCTop.scala 366:44 253:55 366:61]
+  wire [7:0] _GEN_52 = offset == 8'h44 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_16; // @[src/main/scala/rvsoc/RustSoCTop.scala 366:44 253:55 366:61]
+  wire [7:0] _GEN_53 = offset == 8'h48 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_17; // @[src/main/scala/rvsoc/RustSoCTop.scala 366:44 253:55 366:61]
+  wire [7:0] _GEN_54 = offset == 8'h4c ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_18; // @[src/main/scala/rvsoc/RustSoCTop.scala 366:44 253:55 366:61]
+  wire [7:0] _GEN_55 = offset == 8'h50 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_19; // @[src/main/scala/rvsoc/RustSoCTop.scala 366:44 253:55 366:61]
+  wire [7:0] _GEN_56 = offset == 8'h54 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_20; // @[src/main/scala/rvsoc/RustSoCTop.scala 366:44 253:55 366:61]
+  wire [7:0] _GEN_57 = offset == 8'h58 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_21; // @[src/main/scala/rvsoc/RustSoCTop.scala 366:44 253:55 366:61]
+  wire [7:0] _GEN_58 = offset == 8'h5c ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_22; // @[src/main/scala/rvsoc/RustSoCTop.scala 366:44 253:55 366:61]
+  wire [7:0] _GEN_59 = offset == 8'h60 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_23; // @[src/main/scala/rvsoc/RustSoCTop.scala 366:44 253:55 366:61]
+  wire [7:0] _GEN_60 = _T_16 ? cpu_io_dmem_wrData[7:0] : gpioJAPwmEn; // @[src/main/scala/rvsoc/RustSoCTop.scala 372:{36,50} 292:56]
+  wire [7:0] _GEN_61 = _T_9 ? cpu_io_dmem_wrData[7:0] : gpioJAOutReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 371:{35,50} 290:56]
+  wire [7:0] _GEN_62 = _T_9 ? gpioJAPwmEn : _GEN_60; // @[src/main/scala/rvsoc/RustSoCTop.scala 371:35 292:56]
+  wire [7:0] _GEN_63 = _T_11 ? cpu_io_dmem_wrData[7:0] : gpioJADirReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 370:{30,45} 289:56]
+  wire [7:0] _GEN_64 = _T_11 ? gpioJAOutReg : _GEN_61; // @[src/main/scala/rvsoc/RustSoCTop.scala 370:30 290:56]
+  wire [7:0] _GEN_65 = _T_11 ? gpioJAPwmEn : _GEN_62; // @[src/main/scala/rvsoc/RustSoCTop.scala 370:30 292:56]
+  wire [7:0] _GEN_66 = _T_16 ? cpu_io_dmem_wrData[7:0] : gpioJBPwmEn; // @[src/main/scala/rvsoc/RustSoCTop.scala 377:{36,50} 311:56]
+  wire [7:0] _GEN_67 = _T_9 ? cpu_io_dmem_wrData[7:0] : gpioJBOutReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 376:{35,50} 309:56]
+  wire [7:0] _GEN_68 = _T_9 ? gpioJBPwmEn : _GEN_66; // @[src/main/scala/rvsoc/RustSoCTop.scala 376:35 311:56]
+  wire [7:0] _GEN_69 = _T_11 ? cpu_io_dmem_wrData[7:0] : gpioJBDirReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 375:{30,45} 308:56]
+  wire [7:0] _GEN_70 = _T_11 ? gpioJBOutReg : _GEN_67; // @[src/main/scala/rvsoc/RustSoCTop.scala 375:30 309:56]
+  wire [7:0] _GEN_71 = _T_11 ? gpioJBPwmEn : _GEN_68; // @[src/main/scala/rvsoc/RustSoCTop.scala 375:30 311:56]
+  wire [7:0] _GEN_72 = _T_16 ? cpu_io_dmem_wrData[7:0] : gpioJCPwmEn; // @[src/main/scala/rvsoc/RustSoCTop.scala 382:{36,50} 330:56]
+  wire [7:0] _GEN_73 = _T_9 ? cpu_io_dmem_wrData[7:0] : gpioJCOutReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 381:{35,50} 328:56]
+  wire [7:0] _GEN_74 = _T_9 ? gpioJCPwmEn : _GEN_72; // @[src/main/scala/rvsoc/RustSoCTop.scala 381:35 330:56]
+  wire [7:0] _GEN_75 = _T_11 ? cpu_io_dmem_wrData[7:0] : gpioJCDirReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 380:{30,45} 327:56]
+  wire [7:0] _GEN_76 = _T_11 ? gpioJCOutReg : _GEN_73; // @[src/main/scala/rvsoc/RustSoCTop.scala 380:30 328:56]
+  wire [7:0] _GEN_77 = _T_11 ? gpioJCPwmEn : _GEN_74; // @[src/main/scala/rvsoc/RustSoCTop.scala 380:30 330:56]
+  wire [7:0] _GEN_78 = 4'h7 == modSel ? _GEN_75 : gpioJCDirReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 327:56]
+  wire [7:0] _GEN_79 = 4'h7 == modSel ? _GEN_76 : gpioJCOutReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 328:56]
+  wire [7:0] _GEN_80 = 4'h7 == modSel ? _GEN_77 : gpioJCPwmEn; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 330:56]
+  wire [7:0] _GEN_81 = 4'h6 == modSel ? _GEN_69 : gpioJBDirReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 308:56]
+  wire [7:0] _GEN_82 = 4'h6 == modSel ? _GEN_70 : gpioJBOutReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 309:56]
+  wire [7:0] _GEN_83 = 4'h6 == modSel ? _GEN_71 : gpioJBPwmEn; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 311:56]
+  wire [7:0] _GEN_84 = 4'h6 == modSel ? gpioJCDirReg : _GEN_78; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 327:56]
+  wire [7:0] _GEN_85 = 4'h6 == modSel ? gpioJCOutReg : _GEN_79; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 328:56]
+  wire [7:0] _GEN_86 = 4'h6 == modSel ? gpioJCPwmEn : _GEN_80; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 330:56]
+  wire [7:0] _GEN_87 = 4'h5 == modSel ? _GEN_63 : gpioJADirReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 289:56]
+  wire [7:0] _GEN_88 = 4'h5 == modSel ? _GEN_64 : gpioJAOutReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 290:56]
+  wire [7:0] _GEN_89 = 4'h5 == modSel ? _GEN_65 : gpioJAPwmEn; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 292:56]
+  wire [7:0] _GEN_90 = 4'h5 == modSel ? gpioJBDirReg : _GEN_81; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 308:56]
+  wire [7:0] _GEN_91 = 4'h5 == modSel ? gpioJBOutReg : _GEN_82; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 309:56]
+  wire [7:0] _GEN_92 = 4'h5 == modSel ? gpioJBPwmEn : _GEN_83; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 311:56]
+  wire [7:0] _GEN_93 = 4'h5 == modSel ? gpioJCDirReg : _GEN_84; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 327:56]
+  wire [7:0] _GEN_94 = 4'h5 == modSel ? gpioJCOutReg : _GEN_85; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 328:56]
+  wire [7:0] _GEN_95 = 4'h5 == modSel ? gpioJCPwmEn : _GEN_86; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 330:56]
+  wire [15:0] _GEN_96 = 4'h4 == modSel ? _GEN_35 : pwmEnable; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 252:53]
+  wire [7:0] _GEN_97 = 4'h4 == modSel ? _GEN_36 : pwmDutyRegs_0; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 253:55]
+  wire [7:0] _GEN_98 = 4'h4 == modSel ? _GEN_37 : pwmDutyRegs_1; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 253:55]
+  wire [7:0] _GEN_99 = 4'h4 == modSel ? _GEN_38 : pwmDutyRegs_2; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 253:55]
+  wire [7:0] _GEN_100 = 4'h4 == modSel ? _GEN_39 : pwmDutyRegs_3; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 253:55]
+  wire [7:0] _GEN_101 = 4'h4 == modSel ? _GEN_40 : pwmDutyRegs_4; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 253:55]
+  wire [7:0] _GEN_102 = 4'h4 == modSel ? _GEN_41 : pwmDutyRegs_5; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 253:55]
+  wire [7:0] _GEN_103 = 4'h4 == modSel ? _GEN_42 : pwmDutyRegs_6; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 253:55]
+  wire [7:0] _GEN_104 = 4'h4 == modSel ? _GEN_43 : pwmDutyRegs_7; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 253:55]
+  wire [7:0] _GEN_105 = 4'h4 == modSel ? _GEN_44 : pwmDutyRegs_8; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 253:55]
+  wire [7:0] _GEN_106 = 4'h4 == modSel ? _GEN_45 : pwmDutyRegs_9; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 253:55]
+  wire [7:0] _GEN_107 = 4'h4 == modSel ? _GEN_46 : pwmDutyRegs_10; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 253:55]
+  wire [7:0] _GEN_108 = 4'h4 == modSel ? _GEN_47 : pwmDutyRegs_11; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 253:55]
+  wire [7:0] _GEN_109 = 4'h4 == modSel ? _GEN_48 : pwmDutyRegs_12; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 253:55]
+  wire [7:0] _GEN_110 = 4'h4 == modSel ? _GEN_49 : pwmDutyRegs_13; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 253:55]
+  wire [7:0] _GEN_111 = 4'h4 == modSel ? _GEN_50 : pwmDutyRegs_14; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 253:55]
+  wire [7:0] _GEN_112 = 4'h4 == modSel ? _GEN_51 : pwmDutyRegs_15; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 253:55]
+  wire [7:0] _GEN_113 = 4'h4 == modSel ? _GEN_52 : pwmDutyRegs_16; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 253:55]
+  wire [7:0] _GEN_114 = 4'h4 == modSel ? _GEN_53 : pwmDutyRegs_17; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 253:55]
+  wire [7:0] _GEN_115 = 4'h4 == modSel ? _GEN_54 : pwmDutyRegs_18; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 253:55]
+  wire [7:0] _GEN_116 = 4'h4 == modSel ? _GEN_55 : pwmDutyRegs_19; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 253:55]
+  wire [7:0] _GEN_117 = 4'h4 == modSel ? _GEN_56 : pwmDutyRegs_20; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 253:55]
+  wire [7:0] _GEN_118 = 4'h4 == modSel ? _GEN_57 : pwmDutyRegs_21; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 253:55]
+  wire [7:0] _GEN_119 = 4'h4 == modSel ? _GEN_58 : pwmDutyRegs_22; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 253:55]
+  wire [7:0] _GEN_120 = 4'h4 == modSel ? _GEN_59 : pwmDutyRegs_23; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 253:55]
+  wire [7:0] _GEN_121 = 4'h4 == modSel ? gpioJADirReg : _GEN_87; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 289:56]
+  wire [7:0] _GEN_122 = 4'h4 == modSel ? gpioJAOutReg : _GEN_88; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 290:56]
+  wire [7:0] _GEN_123 = 4'h4 == modSel ? gpioJAPwmEn : _GEN_89; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 292:56]
+  wire [7:0] _GEN_124 = 4'h4 == modSel ? gpioJBDirReg : _GEN_90; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 308:56]
+  wire [7:0] _GEN_125 = 4'h4 == modSel ? gpioJBOutReg : _GEN_91; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 309:56]
+  wire [7:0] _GEN_126 = 4'h4 == modSel ? gpioJBPwmEn : _GEN_92; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 311:56]
+  wire [7:0] _GEN_127 = 4'h4 == modSel ? gpioJCDirReg : _GEN_93; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 327:56]
+  wire [7:0] _GEN_128 = 4'h4 == modSel ? gpioJCOutReg : _GEN_94; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 328:56]
+  wire [7:0] _GEN_129 = 4'h4 == modSel ? gpioJCPwmEn : _GEN_95; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 330:56]
+  wire  _GEN_165 = 4'h0 == modSel & _T_9; // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20 274:27]
+  reg [31:0] memAddressReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 389:30]
+  wire  isMMIORead = cpuRunning & memAddressReg[31:28] == 4'hf; // @[src/main/scala/rvsoc/RustSoCTop.scala 390:31]
+  wire [3:0] modSel_1 = memAddressReg[23:20]; // @[src/main/scala/rvsoc/RustSoCTop.scala 393:31]
+  wire [7:0] offset_1 = memAddressReg[7:0]; // @[src/main/scala/rvsoc/RustSoCTop.scala 394:31]
+  wire  _T_51 = offset_1 == 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 398:21]
+  reg [1:0] cpu_io_dmem_rdData_REG; // @[src/main/scala/rvsoc/RustSoCTop.scala 398:61]
+  wire  _T_52 = offset_1 == 8'h4; // @[src/main/scala/rvsoc/RustSoCTop.scala 399:26]
+  wire [31:0] _GEN_238 = offset_1 == 8'h4 ? {{24'd0}, uartRx_io_channel_bits} : _GEN_31; // @[src/main/scala/rvsoc/RustSoCTop.scala 399:{35,56}]
+  wire [31:0] _GEN_239 = offset_1 == 8'h0 ? {{30'd0}, cpu_io_dmem_rdData_REG} : _GEN_238; // @[src/main/scala/rvsoc/RustSoCTop.scala 398:{30,51}]
+  wire  _T_57 = offset_1 == 8'h8; // @[src/main/scala/rvsoc/RustSoCTop.scala 405:26]
+  wire  _T_58 = offset_1 == 8'hc; // @[src/main/scala/rvsoc/RustSoCTop.scala 406:26]
+  wire [31:0] _GEN_240 = offset_1 == 8'hc ? {{16'd0}, adc_io_adcData3} : _GEN_31; // @[src/main/scala/rvsoc/RustSoCTop.scala 406:{36,57}]
+  wire [31:0] _GEN_241 = offset_1 == 8'h8 ? {{16'd0}, adc_io_adcData2} : _GEN_240; // @[src/main/scala/rvsoc/RustSoCTop.scala 405:{36,57}]
+  wire [31:0] _GEN_242 = _T_52 ? {{16'd0}, adc_io_adcData1} : _GEN_241; // @[src/main/scala/rvsoc/RustSoCTop.scala 404:{36,57}]
+  wire [31:0] _GEN_243 = _T_51 ? {{16'd0}, adc_io_adcData0} : _GEN_242; // @[src/main/scala/rvsoc/RustSoCTop.scala 403:{36,57}]
+  wire [31:0] _GEN_244 = _T_51 ? {{16'd0}, pwmEnable} : _GEN_31; // @[src/main/scala/rvsoc/RustSoCTop.scala 409:{30,51}]
+  wire [31:0] _GEN_245 = _T_52 ? {{24'd0}, pwmDutyRegs_0} : _GEN_244; // @[src/main/scala/rvsoc/RustSoCTop.scala 411:{44,65}]
+  wire [31:0] _GEN_246 = _T_57 ? {{24'd0}, pwmDutyRegs_1} : _GEN_245; // @[src/main/scala/rvsoc/RustSoCTop.scala 411:{44,65}]
+  wire [31:0] _GEN_247 = _T_58 ? {{24'd0}, pwmDutyRegs_2} : _GEN_246; // @[src/main/scala/rvsoc/RustSoCTop.scala 411:{44,65}]
+  wire  _T_64 = offset_1 == 8'h10; // @[src/main/scala/rvsoc/RustSoCTop.scala 411:23]
+  wire [31:0] _GEN_248 = offset_1 == 8'h10 ? {{24'd0}, pwmDutyRegs_3} : _GEN_247; // @[src/main/scala/rvsoc/RustSoCTop.scala 411:{44,65}]
+  wire [31:0] _GEN_249 = offset_1 == 8'h14 ? {{24'd0}, pwmDutyRegs_4} : _GEN_248; // @[src/main/scala/rvsoc/RustSoCTop.scala 411:{44,65}]
+  wire [31:0] _GEN_250 = offset_1 == 8'h18 ? {{24'd0}, pwmDutyRegs_5} : _GEN_249; // @[src/main/scala/rvsoc/RustSoCTop.scala 411:{44,65}]
+  wire [31:0] _GEN_251 = offset_1 == 8'h1c ? {{24'd0}, pwmDutyRegs_6} : _GEN_250; // @[src/main/scala/rvsoc/RustSoCTop.scala 411:{44,65}]
+  wire [31:0] _GEN_252 = offset_1 == 8'h20 ? {{24'd0}, pwmDutyRegs_7} : _GEN_251; // @[src/main/scala/rvsoc/RustSoCTop.scala 411:{44,65}]
+  wire [31:0] _GEN_253 = offset_1 == 8'h24 ? {{24'd0}, pwmDutyRegs_8} : _GEN_252; // @[src/main/scala/rvsoc/RustSoCTop.scala 411:{44,65}]
+  wire [31:0] _GEN_254 = offset_1 == 8'h28 ? {{24'd0}, pwmDutyRegs_9} : _GEN_253; // @[src/main/scala/rvsoc/RustSoCTop.scala 411:{44,65}]
+  wire [31:0] _GEN_255 = offset_1 == 8'h2c ? {{24'd0}, pwmDutyRegs_10} : _GEN_254; // @[src/main/scala/rvsoc/RustSoCTop.scala 411:{44,65}]
+  wire [31:0] _GEN_256 = offset_1 == 8'h30 ? {{24'd0}, pwmDutyRegs_11} : _GEN_255; // @[src/main/scala/rvsoc/RustSoCTop.scala 411:{44,65}]
+  wire [31:0] _GEN_257 = offset_1 == 8'h34 ? {{24'd0}, pwmDutyRegs_12} : _GEN_256; // @[src/main/scala/rvsoc/RustSoCTop.scala 411:{44,65}]
+  wire [31:0] _GEN_258 = offset_1 == 8'h38 ? {{24'd0}, pwmDutyRegs_13} : _GEN_257; // @[src/main/scala/rvsoc/RustSoCTop.scala 411:{44,65}]
+  wire [31:0] _GEN_259 = offset_1 == 8'h3c ? {{24'd0}, pwmDutyRegs_14} : _GEN_258; // @[src/main/scala/rvsoc/RustSoCTop.scala 411:{44,65}]
+  wire [31:0] _GEN_260 = offset_1 == 8'h40 ? {{24'd0}, pwmDutyRegs_15} : _GEN_259; // @[src/main/scala/rvsoc/RustSoCTop.scala 411:{44,65}]
+  wire [31:0] _GEN_261 = offset_1 == 8'h44 ? {{24'd0}, pwmDutyRegs_16} : _GEN_260; // @[src/main/scala/rvsoc/RustSoCTop.scala 411:{44,65}]
+  wire [31:0] _GEN_262 = offset_1 == 8'h48 ? {{24'd0}, pwmDutyRegs_17} : _GEN_261; // @[src/main/scala/rvsoc/RustSoCTop.scala 411:{44,65}]
+  wire [31:0] _GEN_263 = offset_1 == 8'h4c ? {{24'd0}, pwmDutyRegs_18} : _GEN_262; // @[src/main/scala/rvsoc/RustSoCTop.scala 411:{44,65}]
+  wire [31:0] _GEN_264 = offset_1 == 8'h50 ? {{24'd0}, pwmDutyRegs_19} : _GEN_263; // @[src/main/scala/rvsoc/RustSoCTop.scala 411:{44,65}]
+  wire [31:0] _GEN_265 = offset_1 == 8'h54 ? {{24'd0}, pwmDutyRegs_20} : _GEN_264; // @[src/main/scala/rvsoc/RustSoCTop.scala 411:{44,65}]
+  wire [31:0] _GEN_266 = offset_1 == 8'h58 ? {{24'd0}, pwmDutyRegs_21} : _GEN_265; // @[src/main/scala/rvsoc/RustSoCTop.scala 411:{44,65}]
+  wire [31:0] _GEN_267 = offset_1 == 8'h5c ? {{24'd0}, pwmDutyRegs_22} : _GEN_266; // @[src/main/scala/rvsoc/RustSoCTop.scala 411:{44,65}]
+  wire [31:0] _GEN_268 = offset_1 == 8'h60 ? {{24'd0}, pwmDutyRegs_23} : _GEN_267; // @[src/main/scala/rvsoc/RustSoCTop.scala 411:{44,65}]
+  wire [7:0] gpioJADebounced = gpioJADebouncer_io_out; // @[src/main/scala/rvsoc/RustSoCTop.scala 293:29 305:19]
+  wire [31:0] _GEN_269 = _T_64 ? {{24'd0}, gpioJADebounced} : _GEN_31; // @[src/main/scala/rvsoc/RustSoCTop.scala 419:{36,57}]
+  wire [31:0] _GEN_270 = _T_58 ? {{24'd0}, gpioJAPwmEn} : _GEN_269; // @[src/main/scala/rvsoc/RustSoCTop.scala 418:{36,57}]
+  wire [7:0] gpioJAIn = bufJA_in; // @[src/main/scala/rvsoc/RustSoCTop.scala 291:26 302:13]
+  wire [31:0] _GEN_271 = _T_57 ? {{24'd0}, gpioJAIn} : _GEN_270; // @[src/main/scala/rvsoc/RustSoCTop.scala 417:{36,57}]
+  wire [31:0] _GEN_272 = _T_52 ? {{24'd0}, gpioJAOutReg} : _GEN_271; // @[src/main/scala/rvsoc/RustSoCTop.scala 416:{36,57}]
+  wire [31:0] _GEN_273 = _T_51 ? {{24'd0}, gpioJADirReg} : _GEN_272; // @[src/main/scala/rvsoc/RustSoCTop.scala 415:{36,57}]
+  wire [7:0] gpioJBDebounced = gpioJBDebouncer_io_out; // @[src/main/scala/rvsoc/RustSoCTop.scala 312:29 324:19]
+  wire [31:0] _GEN_274 = _T_64 ? {{24'd0}, gpioJBDebounced} : _GEN_31; // @[src/main/scala/rvsoc/RustSoCTop.scala 426:{36,57}]
+  wire [31:0] _GEN_275 = _T_58 ? {{24'd0}, gpioJBPwmEn} : _GEN_274; // @[src/main/scala/rvsoc/RustSoCTop.scala 425:{36,57}]
+  wire [7:0] gpioJBIn = bufJB_in; // @[src/main/scala/rvsoc/RustSoCTop.scala 310:26 321:13]
+  wire [31:0] _GEN_276 = _T_57 ? {{24'd0}, gpioJBIn} : _GEN_275; // @[src/main/scala/rvsoc/RustSoCTop.scala 424:{36,57}]
+  wire [31:0] _GEN_277 = _T_52 ? {{24'd0}, gpioJBOutReg} : _GEN_276; // @[src/main/scala/rvsoc/RustSoCTop.scala 423:{36,57}]
+  wire [31:0] _GEN_278 = _T_51 ? {{24'd0}, gpioJBDirReg} : _GEN_277; // @[src/main/scala/rvsoc/RustSoCTop.scala 422:{36,57}]
+  wire [7:0] gpioJCDebounced = gpioJCDebouncer_io_out; // @[src/main/scala/rvsoc/RustSoCTop.scala 331:29 343:19]
+  wire [31:0] _GEN_279 = _T_64 ? {{24'd0}, gpioJCDebounced} : _GEN_31; // @[src/main/scala/rvsoc/RustSoCTop.scala 433:{36,57}]
+  wire [31:0] _GEN_280 = _T_58 ? {{24'd0}, gpioJCPwmEn} : _GEN_279; // @[src/main/scala/rvsoc/RustSoCTop.scala 432:{36,57}]
+  wire [7:0] gpioJCIn = bufJC_in; // @[src/main/scala/rvsoc/RustSoCTop.scala 329:26 340:13]
+  wire [31:0] _GEN_281 = _T_57 ? {{24'd0}, gpioJCIn} : _GEN_280; // @[src/main/scala/rvsoc/RustSoCTop.scala 431:{36,57}]
+  wire [31:0] _GEN_282 = _T_52 ? {{24'd0}, gpioJCOutReg} : _GEN_281; // @[src/main/scala/rvsoc/RustSoCTop.scala 430:{36,57}]
+  wire [31:0] _GEN_283 = _T_51 ? {{24'd0}, gpioJCDirReg} : _GEN_282; // @[src/main/scala/rvsoc/RustSoCTop.scala 429:{36,57}]
+  wire [31:0] _GEN_284 = 4'h7 == modSel_1 ? _GEN_283 : _GEN_31; // @[src/main/scala/rvsoc/RustSoCTop.scala 396:20]
+  wire [31:0] _GEN_285 = 4'h6 == modSel_1 ? _GEN_278 : _GEN_284; // @[src/main/scala/rvsoc/RustSoCTop.scala 396:20]
+  wire [31:0] _GEN_286 = 4'h5 == modSel_1 ? _GEN_273 : _GEN_285; // @[src/main/scala/rvsoc/RustSoCTop.scala 396:20]
+  wire [31:0] _GEN_287 = 4'h4 == modSel_1 ? _GEN_268 : _GEN_286; // @[src/main/scala/rvsoc/RustSoCTop.scala 396:20]
+  wire [31:0] _GEN_288 = 4'h3 == modSel_1 ? _GEN_243 : _GEN_287; // @[src/main/scala/rvsoc/RustSoCTop.scala 396:20]
+  wire [31:0] _GEN_289 = 4'h2 == modSel_1 ? {{28'd0}, btnDebouncer_io_out} : _GEN_288; // @[src/main/scala/rvsoc/RustSoCTop.scala 396:20 401:36]
+  wire [31:0] _GEN_290 = 4'h0 == modSel_1 ? _GEN_239 : _GEN_289; // @[src/main/scala/rvsoc/RustSoCTop.scala 396:20]
   Rx resetRx ( // @[src/main/scala/rvsoc/RustSoCTop.scala 113:23]
     .clock(resetRx_clock),
     .reset(resetRx_reset),
@@ -2336,26 +2777,50 @@ module RustSoCTop(
     .io_channel_valid(uartRx_io_channel_valid),
     .io_channel_bits(uartRx_io_channel_bits)
   );
-  TriStateBuffer8 bufJA ( // @[src/main/scala/rvsoc/RustSoCTop.scala 285:21]
+  ButtonDebouncer btnDebouncer ( // @[src/main/scala/rvsoc/RustSoCTop.scala 282:55]
+    .clock(btnDebouncer_clock),
+    .reset(btnDebouncer_reset),
+    .io_in(btnDebouncer_io_in),
+    .io_out(btnDebouncer_io_out)
+  );
+  TriStateBuffer8 bufJA ( // @[src/main/scala/rvsoc/RustSoCTop.scala 294:21]
     .pad(io_gpioJA),
     .dir(bufJA_dir),
     .out(bufJA_out),
     .in(bufJA_in)
   );
-  TriStateBuffer8 bufJB ( // @[src/main/scala/rvsoc/RustSoCTop.scala 300:21]
+  ButtonDebouncer_1 gpioJADebouncer ( // @[src/main/scala/rvsoc/RustSoCTop.scala 303:58]
+    .clock(gpioJADebouncer_clock),
+    .reset(gpioJADebouncer_reset),
+    .io_in(gpioJADebouncer_io_in),
+    .io_out(gpioJADebouncer_io_out)
+  );
+  TriStateBuffer8 bufJB ( // @[src/main/scala/rvsoc/RustSoCTop.scala 313:21]
     .pad(io_gpioJB),
     .dir(bufJB_dir),
     .out(bufJB_out),
     .in(bufJB_in)
   );
-  TriStateBuffer8 bufJC ( // @[src/main/scala/rvsoc/RustSoCTop.scala 315:21]
+  ButtonDebouncer_1 gpioJBDebouncer ( // @[src/main/scala/rvsoc/RustSoCTop.scala 322:58]
+    .clock(gpioJBDebouncer_clock),
+    .reset(gpioJBDebouncer_reset),
+    .io_in(gpioJBDebouncer_io_in),
+    .io_out(gpioJBDebouncer_io_out)
+  );
+  TriStateBuffer8 bufJC ( // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
     .pad(io_gpioJC),
     .dir(bufJC_dir),
     .out(bufJC_out),
     .in(bufJC_in)
   );
+  ButtonDebouncer_1 gpioJCDebouncer ( // @[src/main/scala/rvsoc/RustSoCTop.scala 341:58]
+    .clock(gpioJCDebouncer_clock),
+    .reset(gpioJCDebouncer_reset),
+    .io_in(gpioJCDebouncer_io_in),
+    .io_out(gpioJCDebouncer_io_out)
+  );
   assign io_tx = cpuRunning ? uartTx_io_txd : 1'h1; // @[src/main/scala/rvsoc/RustSoCTop.scala 268:15]
-  assign io_led = {cpuRunning,ledReg}; // @[src/main/scala/rvsoc/RustSoCTop.scala 419:24]
+  assign io_led = {cpuRunning,ledReg}; // @[src/main/scala/rvsoc/RustSoCTop.scala 442:24]
   assign resetRx_clock = clock;
   assign resetRx_reset = reset;
   assign resetRx_io_rxd = io_rx; // @[src/main/scala/rvsoc/RustSoCTop.scala 114:18]
@@ -2367,7 +2832,7 @@ module RustSoCTop(
   assign cpu_reset = reset | softReset; // @[src/main/scala/rvsoc/RustSoCTop.scala 130:37]
   assign cpu_io_imem_rdData = _bootWrite_T ? 32'h33 : imem_io_rdData; // @[src/main/scala/rvsoc/RustSoCTop.scala 178:15 228:21 229:24]
   assign cpu_io_imem_ack = _bootWrite_T ? 1'h0 : imem_io_ack; // @[src/main/scala/rvsoc/RustSoCTop.scala 178:15 228:21 230:24]
-  assign cpu_io_dmem_rdData = isMMIORead ? _GEN_287 : _GEN_31; // @[src/main/scala/rvsoc/RustSoCTop.scala 372:20]
+  assign cpu_io_dmem_rdData = isMMIORead ? _GEN_290 : _GEN_31; // @[src/main/scala/rvsoc/RustSoCTop.scala 392:20]
   assign imem_clock = clock;
   assign imem_reset = reset;
   assign imem_io_address = bootWrite & ~bootDone ? _GEN_9 : cpu_io_imem_address; // @[src/main/scala/rvsoc/RustSoCTop.scala 178:15 193:32]
@@ -2379,7 +2844,7 @@ module RustSoCTop(
   assign dmem_reset = reset;
   assign dmem_io_address = bootWrite & ~bootDone ? _GEN_14 : cpu_io_dmem_address; // @[src/main/scala/rvsoc/RustSoCTop.scala 179:15 193:32]
   assign dmem_io_rd = bootWrite & ~bootDone ? 1'h0 : cpu_io_dmem_rd; // @[src/main/scala/rvsoc/RustSoCTop.scala 179:15 193:32]
-  assign dmem_io_wr = isMMIOWrite ? 1'h0 : _GEN_25; // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21 365:16]
+  assign dmem_io_wr = isMMIOWrite ? 1'h0 : _GEN_25; // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21 385:16]
   assign dmem_io_wrData = bootWrite & ~bootDone ? _GEN_16 : cpu_io_dmem_wrData; // @[src/main/scala/rvsoc/RustSoCTop.scala 179:15 193:32]
   assign dmem_io_wrMask = bootWrite & ~bootDone ? _GEN_17 : cpu_io_dmem_wrMask; // @[src/main/scala/rvsoc/RustSoCTop.scala 179:15 193:32]
   assign adc_clock = clock;
@@ -2420,18 +2885,30 @@ module RustSoCTop(
   assign pwm_io_duty_23 = pwmDutyRegs_23; // @[src/main/scala/rvsoc/RustSoCTop.scala 257:20]
   assign uartTx_clock = clock;
   assign uartTx_reset = reset | softReset; // @[src/main/scala/rvsoc/RustSoCTop.scala 130:37]
-  assign uartTx_io_channel_valid = isMMIOWrite & _GEN_165; // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21 274:27]
+  assign uartTx_io_channel_valid = isMMIOWrite & _GEN_165; // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21 274:27]
   assign uartTx_io_channel_bits = cpu_io_dmem_wrData[7:0]; // @[src/main/scala/rvsoc/RustSoCTop.scala 273:48]
   assign uartRx_clock = clock;
   assign uartRx_reset = reset | softReset; // @[src/main/scala/rvsoc/RustSoCTop.scala 130:37]
   assign uartRx_io_rxd = cpuRunning ? io_rx : 1'h1; // @[src/main/scala/rvsoc/RustSoCTop.scala 270:23]
-  assign uartRx_io_channel_ready = _isMMIOWrite_T_2 & modSel == 4'h0 & _T_9 & cpu_io_dmem_rd; // @[src/main/scala/rvsoc/RustSoCTop.scala 416:166]
-  assign bufJA_dir = gpioJADirReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 287:16]
-  assign bufJA_out = {bufJA_io_out_hi,bufJA_io_out_lo}; // @[src/main/scala/rvsoc/RustSoCTop.scala 292:30]
-  assign bufJB_dir = gpioJBDirReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 302:16]
-  assign bufJB_out = {bufJB_io_out_hi,bufJB_io_out_lo}; // @[src/main/scala/rvsoc/RustSoCTop.scala 307:30]
-  assign bufJC_dir = gpioJCDirReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 317:16]
-  assign bufJC_out = {bufJC_io_out_hi,bufJC_io_out_lo}; // @[src/main/scala/rvsoc/RustSoCTop.scala 322:30]
+  assign uartRx_io_channel_ready = _isMMIOWrite_T_2 & modSel == 4'h0 & _T_9 & cpu_io_dmem_rd; // @[src/main/scala/rvsoc/RustSoCTop.scala 439:166]
+  assign btnDebouncer_clock = clock;
+  assign btnDebouncer_reset = reset | softReset; // @[src/main/scala/rvsoc/RustSoCTop.scala 130:37]
+  assign btnDebouncer_io_in = io_btn; // @[src/main/scala/rvsoc/RustSoCTop.scala 283:22]
+  assign bufJA_dir = gpioJADirReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 296:16]
+  assign bufJA_out = {bufJA_io_out_hi,bufJA_io_out_lo}; // @[src/main/scala/rvsoc/RustSoCTop.scala 301:30]
+  assign gpioJADebouncer_clock = clock;
+  assign gpioJADebouncer_reset = reset | softReset; // @[src/main/scala/rvsoc/RustSoCTop.scala 130:37]
+  assign gpioJADebouncer_io_in = bufJA_in; // @[src/main/scala/rvsoc/RustSoCTop.scala 291:26 302:13]
+  assign bufJB_dir = gpioJBDirReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 315:16]
+  assign bufJB_out = {bufJB_io_out_hi,bufJB_io_out_lo}; // @[src/main/scala/rvsoc/RustSoCTop.scala 320:30]
+  assign gpioJBDebouncer_clock = clock;
+  assign gpioJBDebouncer_reset = reset | softReset; // @[src/main/scala/rvsoc/RustSoCTop.scala 130:37]
+  assign gpioJBDebouncer_io_in = bufJB_in; // @[src/main/scala/rvsoc/RustSoCTop.scala 310:26 321:13]
+  assign bufJC_dir = gpioJCDirReg; // @[src/main/scala/rvsoc/RustSoCTop.scala 334:16]
+  assign bufJC_out = {bufJC_io_out_hi,bufJC_io_out_lo}; // @[src/main/scala/rvsoc/RustSoCTop.scala 339:30]
+  assign gpioJCDebouncer_clock = clock;
+  assign gpioJCDebouncer_reset = reset | softReset; // @[src/main/scala/rvsoc/RustSoCTop.scala 130:37]
+  assign gpioJCDebouncer_io_in = bufJC_in; // @[src/main/scala/rvsoc/RustSoCTop.scala 329:26 340:13]
   always @(posedge clock) begin
     if (reset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 117:27]
       resetShift <= 32'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 117:27]
@@ -2447,321 +2924,321 @@ module RustSoCTop(
     end
     if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 252:53]
       pwmEnable <= 16'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 252:53]
-    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
-      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
-        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
+    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21]
+      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
+        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
           pwmEnable <= _GEN_96;
         end
       end
     end
     if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
       pwmDutyRegs_0 <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
-    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
-      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
-        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
+    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21]
+      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
+        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
           pwmDutyRegs_0 <= _GEN_97;
         end
       end
     end
     if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
       pwmDutyRegs_1 <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
-    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
-      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
-        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
+    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21]
+      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
+        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
           pwmDutyRegs_1 <= _GEN_98;
         end
       end
     end
     if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
       pwmDutyRegs_2 <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
-    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
-      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
-        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
+    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21]
+      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
+        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
           pwmDutyRegs_2 <= _GEN_99;
         end
       end
     end
     if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
       pwmDutyRegs_3 <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
-    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
-      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
-        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
+    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21]
+      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
+        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
           pwmDutyRegs_3 <= _GEN_100;
         end
       end
     end
     if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
       pwmDutyRegs_4 <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
-    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
-      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
-        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
+    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21]
+      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
+        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
           pwmDutyRegs_4 <= _GEN_101;
         end
       end
     end
     if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
       pwmDutyRegs_5 <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
-    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
-      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
-        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
+    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21]
+      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
+        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
           pwmDutyRegs_5 <= _GEN_102;
         end
       end
     end
     if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
       pwmDutyRegs_6 <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
-    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
-      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
-        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
+    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21]
+      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
+        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
           pwmDutyRegs_6 <= _GEN_103;
         end
       end
     end
     if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
       pwmDutyRegs_7 <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
-    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
-      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
-        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
+    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21]
+      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
+        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
           pwmDutyRegs_7 <= _GEN_104;
         end
       end
     end
     if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
       pwmDutyRegs_8 <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
-    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
-      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
-        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
+    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21]
+      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
+        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
           pwmDutyRegs_8 <= _GEN_105;
         end
       end
     end
     if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
       pwmDutyRegs_9 <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
-    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
-      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
-        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
+    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21]
+      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
+        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
           pwmDutyRegs_9 <= _GEN_106;
         end
       end
     end
     if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
       pwmDutyRegs_10 <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
-    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
-      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
-        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
+    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21]
+      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
+        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
           pwmDutyRegs_10 <= _GEN_107;
         end
       end
     end
     if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
       pwmDutyRegs_11 <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
-    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
-      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
-        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
+    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21]
+      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
+        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
           pwmDutyRegs_11 <= _GEN_108;
         end
       end
     end
     if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
       pwmDutyRegs_12 <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
-    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
-      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
-        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
+    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21]
+      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
+        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
           pwmDutyRegs_12 <= _GEN_109;
         end
       end
     end
     if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
       pwmDutyRegs_13 <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
-    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
-      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
-        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
+    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21]
+      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
+        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
           pwmDutyRegs_13 <= _GEN_110;
         end
       end
     end
     if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
       pwmDutyRegs_14 <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
-    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
-      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
-        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
+    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21]
+      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
+        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
           pwmDutyRegs_14 <= _GEN_111;
         end
       end
     end
     if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
       pwmDutyRegs_15 <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
-    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
-      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
-        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
+    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21]
+      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
+        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
           pwmDutyRegs_15 <= _GEN_112;
         end
       end
     end
     if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
       pwmDutyRegs_16 <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
-    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
-      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
-        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
+    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21]
+      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
+        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
           pwmDutyRegs_16 <= _GEN_113;
         end
       end
     end
     if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
       pwmDutyRegs_17 <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
-    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
-      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
-        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
+    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21]
+      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
+        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
           pwmDutyRegs_17 <= _GEN_114;
         end
       end
     end
     if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
       pwmDutyRegs_18 <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
-    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
-      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
-        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
+    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21]
+      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
+        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
           pwmDutyRegs_18 <= _GEN_115;
         end
       end
     end
     if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
       pwmDutyRegs_19 <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
-    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
-      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
-        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
+    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21]
+      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
+        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
           pwmDutyRegs_19 <= _GEN_116;
         end
       end
     end
     if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
       pwmDutyRegs_20 <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
-    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
-      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
-        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
+    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21]
+      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
+        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
           pwmDutyRegs_20 <= _GEN_117;
         end
       end
     end
     if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
       pwmDutyRegs_21 <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
-    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
-      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
-        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
+    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21]
+      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
+        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
           pwmDutyRegs_21 <= _GEN_118;
         end
       end
     end
     if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
       pwmDutyRegs_22 <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
-    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
-      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
-        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
+    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21]
+      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
+        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
           pwmDutyRegs_22 <= _GEN_119;
         end
       end
     end
     if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
       pwmDutyRegs_23 <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 253:55]
-    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
-      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
-        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
+    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21]
+      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
+        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
           pwmDutyRegs_23 <= _GEN_120;
         end
       end
     end
-    if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 281:56]
-      gpioJADirReg <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 281:56]
-    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
-      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
-        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
+    if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 289:56]
+      gpioJADirReg <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 289:56]
+    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21]
+      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
+        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
           gpioJADirReg <= _GEN_121;
         end
       end
     end
-    if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 282:56]
-      gpioJAOutReg <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 282:56]
-    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
-      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
-        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
+    if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 290:56]
+      gpioJAOutReg <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 290:56]
+    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21]
+      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
+        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
           gpioJAOutReg <= _GEN_122;
         end
       end
     end
-    if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 284:56]
-      gpioJAPwmEn <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 284:56]
-    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
-      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
-        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
+    if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 292:56]
+      gpioJAPwmEn <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 292:56]
+    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21]
+      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
+        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
           gpioJAPwmEn <= _GEN_123;
         end
       end
     end
-    if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 296:56]
-      gpioJBDirReg <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 296:56]
-    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
-      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
-        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
+    if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 308:56]
+      gpioJBDirReg <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 308:56]
+    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21]
+      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
+        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
           gpioJBDirReg <= _GEN_124;
         end
       end
     end
-    if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 297:56]
-      gpioJBOutReg <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 297:56]
-    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
-      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
-        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
+    if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 309:56]
+      gpioJBOutReg <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 309:56]
+    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21]
+      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
+        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
           gpioJBOutReg <= _GEN_125;
         end
       end
     end
-    if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 299:56]
-      gpioJBPwmEn <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 299:56]
-    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
-      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
-        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
+    if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 311:56]
+      gpioJBPwmEn <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 311:56]
+    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21]
+      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
+        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
           gpioJBPwmEn <= _GEN_126;
         end
       end
     end
-    if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 311:56]
-      gpioJCDirReg <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 311:56]
-    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
-      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
-        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
+    if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 327:56]
+      gpioJCDirReg <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 327:56]
+    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21]
+      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
+        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
           gpioJCDirReg <= _GEN_127;
         end
       end
     end
-    if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 312:56]
-      gpioJCOutReg <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 312:56]
-    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
-      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
-        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
+    if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 328:56]
+      gpioJCOutReg <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 328:56]
+    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21]
+      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
+        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
           gpioJCOutReg <= _GEN_128;
         end
       end
     end
-    if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 314:56]
-      gpioJCPwmEn <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 314:56]
-    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
-      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
-        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
+    if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 330:56]
+      gpioJCPwmEn <= 8'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 330:56]
+    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21]
+      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
+        if (!(4'h1 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
           gpioJCPwmEn <= _GEN_129;
         end
       end
     end
-    if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 328:50]
-      ledReg <= 7'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 328:50]
-    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 332:21]
-      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
-        if (4'h1 == modSel) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 336:20]
+    if (combinedReset) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 348:50]
+      ledReg <= 7'h0; // @[src/main/scala/rvsoc/RustSoCTop.scala 348:50]
+    end else if (isMMIOWrite) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 352:21]
+      if (!(4'h0 == modSel)) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
+        if (4'h1 == modSel) begin // @[src/main/scala/rvsoc/RustSoCTop.scala 356:20]
           ledReg <= _GEN_34;
         end
       end
     end
-    memAddressReg <= cpu_io_dmem_address; // @[src/main/scala/rvsoc/RustSoCTop.scala 369:30]
-    cpu_io_dmem_rdData_REG <= {uartRx_io_channel_valid,uartTx_io_channel_ready}; // @[src/main/scala/rvsoc/RustSoCTop.scala 378:86]
+    memAddressReg <= cpu_io_dmem_address; // @[src/main/scala/rvsoc/RustSoCTop.scala 389:30]
+    cpu_io_dmem_rdData_REG <= {uartRx_io_channel_valid,uartTx_io_channel_ready}; // @[src/main/scala/rvsoc/RustSoCTop.scala 398:86]
   end
 // Register and memory initialization
 `ifdef RANDOMIZE_GARBAGE_ASSIGN

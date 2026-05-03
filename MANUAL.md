@@ -14,11 +14,12 @@ En normal processor er en fysisk siliciumchip hvor uforanderlige transistorer ud
 GPIO refererer til de fysiske pins på boardet der kan bruges til at sende eller modtage elektriske signaler. En LED tilsluttet en GPIO-pin kan eksempelvis tændes og slukkes af software, eller en knaps input kan aflæses. "General Purpose" betyder at disse pins ikke er funktionsspecifikke, men derimod kan bruges til hvad end du kobler på dem.
 
 ### Hvad er PMOD GPIO
-PMOD-porte på denne SoC er delt op i tre 8-bit GPIO-banker: JA, JB og JC. Hver bank har fire registre:
+PMOD-porte på denne SoC er delt op i tre 8-bit GPIO-banker: JA, JB og JC. Hver bank har fem registre:
 - `DIR` til at vælge retning for hver pin
 - `OUT` til at skrive output-værdier
 - `IN` til at læse de aktuelle pin-niveauer
 - `PWM_EN` til at route PWM-signalet til specifikke pins
+- `IN_DEBOUNCED` til at læse stabile knap-inputs uden bounce
 
 Det betyder at du både kan styre almindelige digitale signaler og bruge de samme porte til dæmpede outputs, f.eks. en RGB-LED på PMOD-headeren.
 
@@ -127,7 +128,7 @@ Adresserummet er delt i tre områder: IMEM til instruktioner, DMEM til data og s
 | `0xF000_0000` | UART status (bit 0 = TX klar, bit 1 = RX data tilgængelig) | Læs |
 | `0xF000_0004` | UART data (læs = modtag byte, skriv = send byte) | Læs + Skriv |
 | `0xF010_0000` | LED-register (bit 0–6, 8–15 = LEDs, bit 7 = CPU running indikator) | Skriv (bit 7 read-only) |
-| `0xF020_0000` | Button-register (bit 0–3 = btnU, btnL, btnR, btnD) | Læs |
+| `0xF020_0000` | Debounced button-register (bit 0–3 = btnU, btnL, btnR, btnD) | Læs |
 | `0xF030_0000`  | Base address for JXADC analog inputs, offset for four total inputs (e.g. `0xF030_0004`) | Læs |
 | `0xF040_0000` | PWM enable-bitmask (bit N = 1 → LED N styres af PWM, bit 7 ignoreres) | Læs + Skriv |
 | `0xF040_0004` | PWM duty cycle for LED 0 (8-bit værdi 0-255) | Læs + Skriv |
@@ -136,8 +137,9 @@ Adresserummet er delt i tre områder: IMEM til instruktioner, DMEM til data og s
 | `0xF050_0004` | PMOD JA OUT (bit 0–7 = output value per pin) | Læs + Skriv |
 | `0xF050_0008` | PMOD JA IN (bit 0–7 = input value per pin) | Læs |
 | `0xF050_000C` | PMOD JA PWM_EN (bit 0–7 = PWM routing per pin) | Læs + Skriv |
-| `0xF060_0000` | PMOD JB DIR / OUT / IN / PWM_EN (samme layout som JA, offset 0x0/0x4/0x8/0xC) | Læs + Skriv |
-| `0xF070_0000` | PMOD JC DIR / OUT / IN / PWM_EN (samme layout som JA, offset 0x0/0x4/0x8/0xC) | Læs + Skriv |
+| `0xF050_0010` | PMOD JA IN_DEBOUNCED (bit 0–7 = debounced input value per pin) | Læs |
+| `0xF060_0000` | PMOD JB DIR / OUT / IN / PWM_EN / IN_DEBOUNCED (samme layout som JA, offset 0x0/0x4/0x8/0xC/0x10) | Læs + Skriv |
+| `0xF070_0000` | PMOD JC DIR / OUT / IN / PWM_EN / IN_DEBOUNCED (samme layout som JA, offset 0x0/0x4/0x8/0xC/0x10) | Læs + Skriv |
 
 ## Workflow - fra Rust-kode til kørende program
 Når du udvikler programmer til denne SoCc, er dit workflow:
@@ -186,7 +188,7 @@ og bit 8–15 styrer LEDs tilsluttet via Pmod-headeren.
 
 ### Knapper: `btn_read() -> u32`
 
-Returnerer den aktuelle tilstand af de fire retningsknapper. 
+Returnerer den debounced tilstand af de fire retningsknapper.
 Bit 0–3 svarer til de fire knapper — 1 betyder trykket, 
 0 betyder ikke trykket.
 ```rust
@@ -240,10 +242,23 @@ De tre PMOD-porte kan bruges som almindelige GPIO-banker fra Rust. Hver port und
 Pmod::JA.set_dir(0b1111_0000);      // Nederste 4 pins som input, øverste 4 som output
 Pmod::JA.set_out(0b1010_0000);      // Skriv output på de pins der er sat som output
 let input = Pmod::JA.read_in();     // Læs aktuelle niveauer
+let stable = Pmod::JA.read_debounced(); // Læs debounced niveauer
 Pmod::JA.set_pwm_en(0b0111_0000);   // Route PWM til pins 4-6
 ```
 
 For PWM-drevne PMOD-pins bruger den tilhørende software typisk `pwm_set(...)` eller en wrapper som `rgb_set(...)` til at vælge duty cycle, mens `set_pwm_en(...)` bestemmer hvilke pins der faktisk lytter på PWM-signalet.
+
+For knapper på PMOD sættes pinnen som input. Alle PMOD GPIO-pins har interne pullups, så en simpel knap kan forbindes mellem PMOD-pinnen og GND. Brug `button_pressed(bit)` for aktiv-lav knaplogik:
+
+```rust
+Pmod::JA.set_dir(0b0000_0000); // JA som input
+
+if Pmod::JA.button_pressed(0) {
+    println!("JA[0] knap er trykket");
+}
+```
+
+`read_in()` er raw input og kan bounce. `read_debounced()` og `button_pressed()` er beregnet til knapper.
 
 ### PWM: `pwm_set_duty(channel: u8, percent: u8)`
 
@@ -316,6 +331,9 @@ De prædefinerede adresser er:
 | `BTN_REG` | `0xF020_0000` | `*const u32` | Button-register |
 | `ADC_BASE` | `0xF030_0000` | `*const u32` | ADC-base (4 kanaler, offset 0-12) |
 | `PWM_BASE` | `0xF040_0000` | `*mut u32` | PWM-base (enable + 16 duty registre) |
+| `PMOD_JA_BASE` | `0xF050_0000` | GPIO bank | DIR/OUT/IN/PWM_EN/IN_DEBOUNCED |
+| `PMOD_JB_BASE` | `0xF060_0000` | GPIO bank | Samme layout som JA |
+| `PMOD_JC_BASE` | `0xF070_0000` | GPIO bank | Samme layout som JA |
 
 
 ## Eksempler på programmering

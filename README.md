@@ -128,8 +128,10 @@ After boot, the program prints "PASS" over UART and demonstrates all peripherals
 ### GPIO overview
 The hardware exposes three software-controlled PMOD GPIO banks in addition to the onboard LEDs, buttons, and ADC:
 - Each PMOD bank has direction, output, input, and PWM-enable registers.
+- Each PMOD bank also has a debounced input register for button-style reads.
 - The current Rust program uses JA for button mirroring and RGB PWM output.
 - GPIOs can be driven directly from Rust through the MMIO helpers in `sw/program/src/main.rs`.
+- PMOD buttons can be wired from a GPIO pin to GND; internal pullups keep the idle state high.
 
 The test circuit below is the hardware setup used by the code currently running in [sw/program/src/main.rs](sw/program/src/main.rs).
 

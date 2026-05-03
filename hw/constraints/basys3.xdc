@@ -108,6 +108,7 @@ set_property PACKAGE_PIN H1 [get_ports {io_gpioJA[4]}]
 set_property PACKAGE_PIN K2 [get_ports {io_gpioJA[5]}]
 set_property PACKAGE_PIN H2 [get_ports {io_gpioJA[6]}]
 set_property PACKAGE_PIN G3 [get_ports {io_gpioJA[7]}]
+set_property PULLUP true [get_ports {io_gpioJA[*]}]
 
 
 ##Pmod Header JB
@@ -119,6 +120,7 @@ set_property PACKAGE_PIN A15 [get_ports {io_gpioJB[4]}]
 set_property PACKAGE_PIN A17 [get_ports {io_gpioJB[5]}]
 set_property PACKAGE_PIN C15 [get_ports {io_gpioJB[6]}]
 set_property PACKAGE_PIN C16 [get_ports {io_gpioJB[7]}]
+set_property PULLUP true [get_ports {io_gpioJB[*]}]
  
 
 ##Pmod Header JC
@@ -130,6 +132,7 @@ set_property PACKAGE_PIN L17 [get_ports {io_gpioJC[4]}]
 set_property PACKAGE_PIN M19 [get_ports {io_gpioJC[5]}]
 set_property PACKAGE_PIN P17 [get_ports {io_gpioJC[6]}]
 set_property PACKAGE_PIN R18 [get_ports {io_gpioJC[7]}]
+set_property PULLUP true [get_ports {io_gpioJC[*]}]
 
 
 ##Pmod Header JXADC
