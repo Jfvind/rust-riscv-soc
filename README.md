@@ -128,8 +128,10 @@ After boot, the program prints "PASS" over UART and demonstrates all peripherals
 ### GPIO overview
 The hardware exposes three software-controlled PMOD GPIO banks in addition to the onboard LEDs, buttons, and ADC:
 - Each PMOD bank has direction, output, input, and PWM-enable registers.
+- Each PMOD bank also has a debounced input register for button-style reads.
 - The current Rust program uses JA for button mirroring and RGB PWM output.
 - GPIOs can be driven directly from Rust through the MMIO helpers in `sw/program/src/main.rs`.
+- PMOD buttons can be wired from a GPIO pin to GND; internal pullups keep the idle state high.
 
 The test circuit below is the hardware setup used by the code currently running in [sw/program/src/main.rs](sw/program/src/main.rs).
 
@@ -180,6 +182,7 @@ Look for something like /dev/ttyUSB0 or /dev/ttyUSB1.
 cargo xtask upload <your_COM_port>
 ```
 **Note:** You can re-upload anytime after changing the rust file and then running `cargo xtask upload <your_COM_port>` again.
+The bootloader routes uploaded words by address: instructions in `0x0000_0000` - `0x0000_0FFF` go to IMEM, and data in `0x0000_1000` - `0x0000_1FFF` go to DMEM.
 
 ### :broom: 5. Clean up (Optional)
 Since the CPU is stored in the flash memory, the generated files are not necessary.

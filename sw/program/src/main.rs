@@ -97,7 +97,7 @@ pub enum Pmod {
     JC = 0xF070_0000,
 }
 
-// offsets: 0=DIR, 4=OUT, 8=IN, 12=PWM_EN
+// offsets: 0=DIR, 4=OUT, 8=IN, 12=PWM_EN, 16=IN_DEBOUNCED
 impl Pmod {
     pub fn set_dir(self, mask: u8) {
         unsafe { (self as usize as *mut u32).offset(0).write_volatile(mask as u32); }
@@ -106,10 +106,19 @@ impl Pmod {
         unsafe { (self as usize as *mut u32).offset(1).write_volatile(mask as u32); }
     }
     pub fn read_in(self) -> u8 {
-        unsafe { (self as usize as *mut u32).offset(2).read_volatile() as u8}
+        unsafe { (self as usize as *const u32).offset(2).read_volatile() as u8 }
+    }
+    pub fn read_debounced(self) -> u8 {
+        unsafe { (self as usize as *const u32).offset(4).read_volatile() as u8 }
     }
     pub fn set_pwm_en(self, mask: u8) {
         unsafe { (self as usize as *mut u32).offset(3).write_volatile(mask as u32); }
+    }
+    pub fn button_pressed(self, bit: u8) -> bool {
+        if bit >= 8 {
+            return false;
+        }
+        (self.read_debounced() & (1u8 << bit)) == 0
     }
 }
 
