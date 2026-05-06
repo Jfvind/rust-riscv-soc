@@ -111,6 +111,12 @@ class I2cController(systemClockHz: Int = 100_000_000,
   // is HIGH, causing shiftReg to be over-shifted and produce 0xFF readings.
   val bitSampledReg = RegInit(false.B)
 
+  // Latches whether the current READ should ACK or NACK the slave on the 9th
+  // clock. io.cmd is only valid for the single cycle when the CPU writes to
+  // I2C_CMD; without latching, sReadAck would always see io.cmd = 0 and send
+  // NACK, killing multi-byte reads after the first byte.
+  val readSendAckReg = RegInit(false.B)
+
   // Clock divider value (From CPU, or default if CPU wrote 0)
   val clkDivEffective = Mux(io.clkDiv === 0.U, (systemClockHz / defaultI2cHz / 2).U,
                                                io.clkDiv)
@@ -171,8 +177,14 @@ class I2cController(systemClockHz: Int = 100_000_000,
             shiftReg := io.dataIn // load byte to transmit
             state := sWrite
           }
-          is (I2cCmd.READ_ACK.U) { state := sRead }
-          is (I2cCmd.READ_NACK.U) { state := sRead }
+          is (I2cCmd.READ_ACK.U) {
+            readSendAckReg := true.B
+            state := sRead
+          }
+          is (I2cCmd.READ_NACK.U) {
+            readSendAckReg := false.B
+            state := sRead
+          }
         }
       }
     }
@@ -357,7 +369,7 @@ class I2cController(systemClockHz: Int = 100_000_000,
     // ACK = drive SDA LOW ("give me more")
     // NACK = release SDA ("that was the last byte")
     is(sReadAck) {
-      val sendAck = io.cmd === I2cCmd.READ_ACK.U
+      val sendAck = readSendAckReg
 
 
       when(phase === 0.U) {
