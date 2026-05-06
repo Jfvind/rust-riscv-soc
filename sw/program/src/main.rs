@@ -478,59 +478,31 @@ fn main() {
             if cmd_ok {
                 delay_cycles(500_000); // 5 ms
 
-                // ===== TEST A: Read only 2 bytes =====
-                println!("Test A: read 2 bytes only");
-                let mut respA = [0u8; 2];
+                // ===== Sensor liveness test after ACK on byte 0 =====
+                // Read byte 0 with ACK, then issue a repeated START + addr+R.
+                // If the sensor is still awake, it ACKs the re-addressing.
+                // If it has gone to sleep (despite no STOP), it NACKs.
+                // This isolates whether the byte 1+ FF problem is sensor-side
+                // (sleep) or controller-side (read sampling).
+                println!("Liveness test: read byte 0, then re-address sensor");
+
                 i2c_start();
-                let addrA_ok = i2c_write_byte((0x5C << 1) | 1);
-                println!("  Addr ACK: {} status={:02X}", addrA_ok, i2c_status());
-                if addrA_ok {
+                let addr_ok = i2c_write_byte((0x5C << 1) | 1);
+                println!("  Initial addr ACK: {} status={:02X}", addr_ok, i2c_status());
+
+                if addr_ok {
                     delay_cycles(5_000); // 50 us
-                    for i in 0..2 {
-                        let send_ack = i != 1;
-                        respA[i] = i2c_read_byte(send_ack);
-                        println!("  Byte {}: {:02X} status={:02X}", i, respA[i], i2c_status());
-                    }
-                }
-                i2c_stop();
-                println!("Test A result: {:02X} {:02X}", respA[0], respA[1]);
+                    let byte0 = i2c_read_byte(true); // ACK to byte 0
+                    println!("  Byte 0: {:02X} status={:02X}", byte0, i2c_status());
 
-                // ===== TEST B: 8 bytes with 100us inter-byte delay =====
-                // Re-wake first since Test A's STOP put sensor to sleep
-                delay_cycles(10_000_000); // 100 ms gap
-                i2c_wait_idle();
-                i2c_set_clkdiv(5000);
-                i2c_start();
-                i2c_write_byte((0x5C << 1) | 0);
-                i2c_stop();
-                i2c_wait_idle();
-                i2c_set_clkdiv(500);
-                delay_cycles(200_000); // 2 ms
-
-                let cmdB_ok = i2c_write_bytes(0x5C, &cmd);
-                println!("Test B cmd ACK: {}", cmdB_ok);
-
-                if cmdB_ok {
-                    delay_cycles(500_000); // 5 ms
-                    println!("Test B: read 8 bytes with 100us inter-byte delay");
-                    let mut respB = [0u8; 8];
+                    // Repeated START - new START without STOP first.
+                    // Sensor should ACK if still awake.
                     i2c_start();
-                    let addrB_ok = i2c_write_byte((0x5C << 1) | 1);
-                    println!("  Addr ACK: {} status={:02X}", addrB_ok, i2c_status());
-                    if addrB_ok {
-                        delay_cycles(5_000); // 50 us
-                        for i in 0..8 {
-                            let send_ack = i != 7;
-                            respB[i] = i2c_read_byte(send_ack);
-                            println!("  Byte {}: {:02X} status={:02X}", i, respB[i], i2c_status());
-                            delay_cycles(10_000); // 100 us between bytes
-                        }
-                    }
-                    i2c_stop();
-                    println!("Test B result: {:02X} {:02X} {:02X} {:02X} {:02X} {:02X} {:02X} {:02X}",
-                        respB[0], respB[1], respB[2], respB[3],
-                        respB[4], respB[5], respB[6], respB[7]);
+                    let readdr_ok = i2c_write_byte((0x5C << 1) | 1);
+                    println!("  Re-addr ACK: {} status={:02X} (true = sensor awake, false = sleep)",
+                        readdr_ok, i2c_status());
                 }
+                i2c_stop();
             }
         }
 
