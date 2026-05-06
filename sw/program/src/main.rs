@@ -473,58 +473,63 @@ fn main() {
             // This requests humidity (regs 0-1) and temperature (regs 2-3).
             let cmd = [0x03u8, 0x00, 0x04];
             let cmd_ok = i2c_write_bytes(0x5C, &cmd);
-            println!("Cmd ACK: {} (expected: true)", cmd_ok);
+            println!("Cmd ACK: {} (expected: true)", cmd_ok);            
 
             if cmd_ok {
-                // Wait at least 1.5 ms for the sensor to prepare its reply.
                 delay_cycles(500_000); // 5 ms
 
-                // ===== TEST 1: Read 8 bytes with status print after each byte =====
-                // This shows whether BUS_ERR or unexpected NACK arises during
-                // the read, and lets us distinguish between sensor failure and
-                // controller failure mid-read.
-                println!("Test 1: read 8 bytes with status print");
-
-                let mut response = [0u8; 8];
-
-                // Open the read transaction manually so we can poke status
-                // between each i2c_read_byte() call.
+                // ===== TEST A: Read only 2 bytes =====
+                println!("Test A: read 2 bytes only");
+                let mut respA = [0u8; 2];
                 i2c_start();
-                let addr_ok = i2c_write_byte((0x5C << 1) | 1);
-                println!("  Addr ACK: {} status={:02X}", addr_ok, i2c_status());
-
-                if addr_ok {
-                    delay_cycles(5_000); // 50 us, AM2320 30us minimum
-                    for i in 0..8 {
-                        let send_ack = i != 7;
-                        response[i] = i2c_read_byte(send_ack);
-                        println!("  Byte {}: {:02X} status={:02X}", i, response[i], i2c_status());
+                let addrA_ok = i2c_write_byte((0x5C << 1) | 1);
+                println!("  Addr ACK: {} status={:02X}", addrA_ok, i2c_status());
+                if addrA_ok {
+                    delay_cycles(5_000); // 50 us
+                    for i in 0..2 {
+                        let send_ack = i != 1;
+                        respA[i] = i2c_read_byte(send_ack);
+                        println!("  Byte {}: {:02X} status={:02X}", i, respA[i], i2c_status());
                     }
                 }
                 i2c_stop();
+                println!("Test A result: {:02X} {:02X}", respA[0], respA[1]);
 
-                println!("Test 1 result: {:02X} {:02X} {:02X} {:02X} {:02X} {:02X} {:02X} {:02X}",
-                    response[0], response[1], response[2], response[3],
-                    response[4], response[5], response[6], response[7]);
+                // ===== TEST B: 8 bytes with 100us inter-byte delay =====
+                // Re-wake first since Test A's STOP put sensor to sleep
+                delay_cycles(10_000_000); // 100 ms gap
+                i2c_wait_idle();
+                i2c_set_clkdiv(5000);
+                i2c_start();
+                i2c_write_byte((0x5C << 1) | 0);
+                i2c_stop();
+                i2c_wait_idle();
+                i2c_set_clkdiv(500);
+                delay_cycles(200_000); // 2 ms
 
-                // ===== TEST 2: Second read transaction without new wake =====
-                // Wait 100 ms then try to read 8 more bytes. If byte 0 is still
-                // 0x03, the sensor is still awake. If 0xFF, it has gone to sleep.
-                println!("Test 2: 100ms pause, then second read without wake");
-                delay_cycles(10_000_000); // 100 ms
+                let cmdB_ok = i2c_write_bytes(0x5C, &cmd);
+                println!("Test B cmd ACK: {}", cmdB_ok);
 
-                // Send Modbus read command again (no wake first)
-                let cmd2_ok = i2c_write_bytes(0x5C, &cmd);
-                println!("  Cmd2 ACK: {} status={:02X}", cmd2_ok, i2c_status());
-
-                if cmd2_ok {
+                if cmdB_ok {
                     delay_cycles(500_000); // 5 ms
-                    let mut response2 = [0u8; 8];
-                    let read2_ok = i2c_read_bytes(0x5C, &mut response2);
-                    println!("  Read2 OK: {}", read2_ok);
-                    println!("Test 2 result: {:02X} {:02X} {:02X} {:02X} {:02X} {:02X} {:02X} {:02X}",
-                        response2[0], response2[1], response2[2], response2[3],
-                        response2[4], response2[5], response2[6], response2[7]);
+                    println!("Test B: read 8 bytes with 100us inter-byte delay");
+                    let mut respB = [0u8; 8];
+                    i2c_start();
+                    let addrB_ok = i2c_write_byte((0x5C << 1) | 1);
+                    println!("  Addr ACK: {} status={:02X}", addrB_ok, i2c_status());
+                    if addrB_ok {
+                        delay_cycles(5_000); // 50 us
+                        for i in 0..8 {
+                            let send_ack = i != 7;
+                            respB[i] = i2c_read_byte(send_ack);
+                            println!("  Byte {}: {:02X} status={:02X}", i, respB[i], i2c_status());
+                            delay_cycles(10_000); // 100 us between bytes
+                        }
+                    }
+                    i2c_stop();
+                    println!("Test B result: {:02X} {:02X} {:02X} {:02X} {:02X} {:02X} {:02X} {:02X}",
+                        respB[0], respB[1], respB[2], respB[3],
+                        respB[4], respB[5], respB[6], respB[7]);
                 }
             }
         }
