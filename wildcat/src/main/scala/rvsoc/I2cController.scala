@@ -105,6 +105,12 @@ class I2cController(systemClockHz: Int = 100_000_000,
   val nackReg = RegInit(false.B)
   val busErrReg = RegInit(false.B)
 
+  // Tracks whether SDA has been sampled for the current bit. Set when we
+  // successfully sample, cleared at the start of each new bit (phase 0).
+  // Without this, sampling would repeat every system clock cycle that SCL
+  // is HIGH, causing shiftReg to be over-shifted and produce 0xFF readings.
+  val bitSampledReg = RegInit(false.B)
+
   // Clock divider value (From CPU, or default if CPU wrote 0)
   val clkDivEffective = Mux(io.clkDiv === 0.U, (systemClockHz / defaultI2cHz / 2).U,
                                                io.clkDiv)
@@ -271,6 +277,7 @@ class I2cController(systemClockHz: Int = 100_000_000,
       when(phase === 0.U) {
         sdaOeReg := false.B // Master release SDA (slave takes over)
         sclOeReg := true.B  // SCL LOW
+        bitSampledReg := false.B // Reset for the ACK bit
       }.elsewhen(phase === 1.U) {
         sdaOeReg := false.B
         sclOeReg := false.B // Release SCL
@@ -279,8 +286,13 @@ class I2cController(systemClockHz: Int = 100_000_000,
           phase := phase
           tickCounter := 0.U
         }.otherwise {
-          // SCL is HIGH, sample the ACK bit
-          nackReg := io.sdaIn // 0=ACK (good), 1 NACK (bad)
+          // SCL is HIGH - sample the ACK bit exactly once. Same multi-sample
+          // bug as in sRead applies here: sampling every cycle would let
+          // a late slave SDA release flip nackReg from ACK to NACK.
+          when(!bitSampledReg) {
+            nackReg := io.sdaIn // 0=ACK (good), 1 NACK (bad)
+            bitSampledReg := true.B
+          }
         }
       }.elsewhen(phase === 2.U) {
         sdaOeReg := false.B
@@ -303,16 +315,24 @@ class I2cController(systemClockHz: Int = 100_000_000,
       when(phase === 0.U) {
         sdaOeReg := false.B // Release SDA
         sclOeReg := true.B // SCL LOW
+        bitSampledReg := false.B // Reset for this new bit
       }.elsewhen(phase === 1.U) {
         sdaOeReg := false.B
         sclOeReg := false.B // release SCL (HIGH)
 
         when(!io.sclIn) {
+          // Slave is clock-stretching, or SCL hasn't risen yet via pull-up.
+          // Stay in this phase until SCL is HIGH.
           phase := phase
           tickCounter := 0.U
         }.otherwise {
-          // sample SDA and shift into shiftReg
-          shiftReg := Cat(shiftReg(6, 0), io.sdaIn)
+          // SCL is HIGH - sample SDA exactly once for this bit. Subsequent
+          // cycles in phase 1 with SCL HIGH must NOT re-sample, otherwise
+          // shiftReg gets over-shifted and we read garbage (0xFF).
+          when(!bitSampledReg) {
+            shiftReg := Cat(shiftReg(6, 0), io.sdaIn)
+            bitSampledReg := true.B
+          }
         }
       }.elsewhen(phase === 2.U) {
         sdaOeReg := false.B
