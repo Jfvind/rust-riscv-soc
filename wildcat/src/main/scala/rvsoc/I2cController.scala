@@ -375,9 +375,16 @@ class I2cController(systemClockHz: Int = 100_000_000,
         sdaOeReg := sendAck
         sclOeReg := false.B
       }.otherwise {
-        // Phase 3: done
+        // Phase 3: drive SCL LOW. Do NOT release SDA here - releasing SDA
+        // in the same cycle as SCL is driven LOW creates a race where SDA's
+        // slow pull-up rise can be detected as a STOP condition (SDA LOW->
+        // HIGH while SCL still HIGH due to drive delay). For ACK case this
+        // caused the sensor to see a false STOP and stop sending subsequent
+        // bytes. Keep SDA at its sendAck value; next state (sRead phase 0
+        // or sStop phase 0) will explicitly drive SDA appropriately while
+        // SCL is LOW.
         sclOeReg := true.B
-        sdaOeReg := false.B // Release SDA
+        sdaOeReg := sendAck
 
         when(phaseAdvance) {
           state := sIdle
