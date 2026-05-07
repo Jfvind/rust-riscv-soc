@@ -164,13 +164,225 @@ fn rgb_set(r: u8, g: u8, b: u8) {
     pwm_set_duty(6, 100 - b); // JA9
 }
 
-// ── 9. APP ────────────────────────────────────────────────────────
+// ── 9. HAL: I2C ────────────────────────────────────────────────────────
+// I2C controller MMIO-adresses --> matches chisel def in I2cController.scala
+// & MMIO decoder in RustSoCTop.scala (modSel = 8, base 0xF080_000).
+const I2C_CMD:    *mut u32   = 0xF080_0000 as *mut u32;
+const I2C_DATA:   *mut u32   = 0xF080_0004 as *mut u32;
+const I2C_STATUS: *const u32 = 0xF080_0008 as *const u32;
+const I2C_CLKDIV: *mut u32   = 0xF080_000C as *mut u32;
+
+// Commando-codes which can be written to I2C_CMD: matches the object I2c_Cmd
+const I2C_CMD_START:     u32 = 0x01;
+const I2C_CMD_STOP:      u32 = 0x02;
+const I2C_CMD_WRITE:     u32 = 0x04;
+const I2C_CMD_READ_ACK:  u32 = 0x08;
+const I2C_CMD_READ_NACK: u32 = 0x10;
+
+// Status bits read from I2C_STATUS: matches object I2cStatus 
+const I2C_STATUS_BUSY:    u32 = 1 << 0;
+const I2C_STATUS_NACK:    u32 = 1 << 1;
+const I2C_STATUS_BUS_ERR: u32 = 1 << 2;
+
+// Read a 64-bit cycle counter from CSR (rdcycle + rdcycleh).
+// Used for precise timing delays.
+fn read_cycles() -> u64 {
+    let lo: u32;
+    let hi: u32;
+    unsafe {
+        // rdcycle = csrrs rd, cycle, x0 (CSR-address 0xC00)
+        // rdcycleh = csrrs rd, cycleh, c0 (CSR-address 0xC80)
+        core::arch::asm!("rdcycle {0}", out(reg) lo);
+        core::arch::asm!("rdcycleh {0}", out(reg) hi);
+    }
+    ((hi as u64) << 32) | (lo as u64)
+}
+
+// Dealy for 'cycles' clock cycles: (At 100 MHz) --> 100 cycles = 1 µs, 100_000 cycles = 1 ms.
+fn delay_cycles(cycles: u64) {
+    let start = read_cycles();
+    while read_cycles().wrapping_sub(start) < cycles {}
+}
+
+// Configurable SCL-frequency by writing to the clock divider directly.
+// 0 = deafault (100 kHz). Other values: divider = systemClockHz / (i2cHz * 2)
+// Examples at 100 kHz system clock:
+//      500 -> 100 kHz (standard mode)
+//      125 -> 400 kHz (fast mode)
+fn i2c_set_clkdiv(divider: u16) {
+    unsafe { I2C_CLKDIV.write_volatile(divider as u32); }
+}
+
+// Wait untill the controller is no longer busy executing a commando.
+fn i2c_wait_idle() {
+    unsafe {
+        while (I2C_STATUS.read_volatile() & I2C_STATUS_BUSY) != 0 {}
+    }
+}
+
+/// Read raw status register. Useful for debugging - shows BUSY/NACK/BUS_ERR bits.
+fn i2c_status() -> u32 {
+    unsafe { I2C_STATUS.read_volatile() }
+}
+
+// Generate START condition on the BUS. Needs to be called at the start of every transaction.
+fn i2c_start() {
+    unsafe { I2C_CMD.write_volatile(I2C_CMD_START); }
+    i2c_wait_idle();
+}
+
+// Generate STOP condition on the BUS. Needs to be called at the end of each transaction to release the BUS.
+fn i2c_stop() {
+    unsafe { I2C_CMD.write_volatile(I2C_CMD_STOP); }
+    i2c_wait_idle();
+}
+
+// Send one byte: returns true if the slave responded with ACK, false if NACK.
+// To send a slave-adress: byte = (addr << 1) | rw_bit, where rw=0 for write, 1 for read.
+fn i2c_write_byte(byte: u8) -> bool {
+    unsafe { 
+        I2C_DATA.write_volatile(byte as u32);
+        I2C_CMD.write_volatile(I2C_CMD_WRITE);
+    }
+    i2c_wait_idle();
+    let nack = unsafe { (I2C_STATUS.read_volatile() & I2C_STATUS_NACK) != 0 };
+    !nack
+}
+
+// Receive one byte. If send_ack=true, the master signals "send me more bytes".
+// If false, the master signals "This was the last byte" (NACK).
+fn i2c_read_byte(send_ack: bool) -> u8 {
+    let cmd = if send_ack { I2C_CMD_READ_ACK } else { I2C_CMD_READ_NACK };
+    unsafe { 
+        I2C_CMD.write_volatile(cmd);
+    }
+    i2c_wait_idle();
+    unsafe { I2C_DATA.read_volatile() as u8 }
+}
+
+// Write a whole buffer to a slave on the 7-bit adress 'addr'.
+// Returns true if the whole transaction was ACK(nowledged).
+// Sequence: START --> adress+W --> data pushed out on SDA --> STOP
+fn i2c_write_bytes(addr: u8, data: &[u8]) -> bool {
+    i2c_start();
+    if !i2c_write_byte((addr << 1) | 0) {
+        i2c_stop();
+        return false;
+    }
+    for &b in data {
+        if !i2c_write_byte(b) {
+            i2c_stop();
+            return false;
+        }
+    }
+    i2c_stop();
+    true
+}
+
+// Read a whole buffer from a slave on a 7-bit adress 'addr'.
+// Return true if the adress+R was ack'et og the bytes was received.
+// Sequence: START --> adress+R --> read byte (ack on all bytes but the last) --> STOP.
+fn i2c_read_bytes(addr: u8, buf: &mut [u8]) -> bool {
+    if buf.is_empty() {
+        return true;
+    }
+    i2c_start();
+    if !i2c_write_byte((addr << 1) | 1) {
+        i2c_stop();
+        return false;
+    }
+    // Wait at least 30 microseconds after the address byte before clocking
+    // the first data bit. Required by AM2320-class slaves that need time
+    // to prepare data after acknowledging their address. Standard slaves
+    // would clock-stretch instead, but some quirky chips do not.
+    // 5000 cycles at 100 MHz = 50 microseconds, comfortably above the minimum.
+    delay_cycles(5_000);
+    let last = buf.len() - 1;
+    for i in 0..buf.len() {
+        let send_ack = i != last;
+        buf[i] = i2c_read_byte(send_ack);
+    }
+    i2c_stop();
+    true
+}
+
+// Write-then-read on the same transaction: the classic "read sensor-register" pattern.
+// Sequence: START --> Adress+W --> write_data... --> REPEATED START --> Adress+R --> Read byte --> STOP.
+// Used foir chips where you select a register-number first and the read it's contents.
+fn i2c_write_read(addr: u8, write_data: &[u8], read_buf: &mut [u8]) -> bool {
+    i2c_start();
+    if !i2c_write_byte((addr << 1) | 0) {
+        i2c_stop();
+        return false;
+    }
+    for &b in write_data {
+        if !i2c_write_byte(b) {
+            i2c_stop();
+            return false;
+        }
+    }
+    // Repeated START - new START without STOP first
+    i2c_start();
+    if !i2c_write_byte((addr << 1) | 1) {
+        i2c_stop();
+        return false;
+    }
+    // Wait at least 30 microseconds after the read address byte. See
+    // i2c_read_bytes for full explanation.
+    delay_cycles(5_000);
+    if !read_buf.is_empty() {
+        let last = read_buf.len() - 1;
+        for i in 0..read_buf.len() {
+            let send_ack = i != last;
+            read_buf[i] = i2c_read_byte(send_ack);
+        }
+    }
+    i2c_stop();
+    true
+}
+
+// Scan the bus to find connected devices.
+// Sends START --> Adress+W to each possible 7-bit adress (0x08-0x77) og looks if any corresponding devices respond with a ACK.
+// 'found' is filled with the adresses that answered; returns the amount of devices found.
+fn i2c_scan(found: &mut [u8]) -> usize {
+    let mut count = 0;
+    for addr in 0x08u8..=0x77 {
+        i2c_start();
+        let acked = i2c_write_byte((addr << 1) | 0);
+        i2c_stop();
+        if acked && count < found.len() {
+            found[count] = addr;
+            count += 1;
+        }
+    }
+    count
+}  
+
+
+// ── 10. APP ────────────────────────────────────────────────────────
 fn main() {
     
     // Use safe HAL for writing to UART
     println!("=== DTU MCU Booted ===");
     println!("SRAM Size: {} bytes", 4096);
     println!("Status: PASS");
+
+    // Configure I2C bus to 100 kHz (standard mode)
+    i2c_set_clkdiv(500);
+
+    // Sanity check: NACK detection.
+    // Send a WRITE to address 0x42 (no slave should exist there). If our
+    // controller correctly detects the missing ACK, we should get false.
+    // If we get true, something is wrong with our controller and any
+    // subsequent results are suspect.
+    i2c_start();
+    let fake_acked = i2c_write_byte((0x42 << 1) | 0);
+    i2c_stop();
+    if fake_acked {
+        println!("NACK detection: FAIL (got ACK from nonexistent 0x42)");
+    } else {
+        println!("NACK detection: PASS");
+    }
 
     // set JA LEDs as output
     Pmod::JA.set_dir(0b0111_0111);
@@ -182,6 +394,11 @@ fn main() {
     let mut fade: u8 = 0;
     let mut fade_up = true;
     let mut color_phase: u8 = 0; // 0 = red, 1 = green, 2 = blue
+
+    // AM2320 read-throttle counter. Sensor must not be polled more
+    // often than -once per 2 seconds, so we only read every Nth loop.
+    let mut am2320_counter: u32 = 0;
+    const AM2320_INTERVAL: u32 = 1000;
 
     loop {
         // 1) Read peripherals
@@ -225,14 +442,69 @@ fn main() {
             }
         }
 
-        // 5) Small delay to set animation speed.
+        // 5) AM2320 temperature/humidity read every AM2320_INTERVAL iterations
+        am2320_counter += 1;
+        if am2320_counter >= AM2320_INTERVAL {
+            am2320_counter = 0;
+
+            println!("--- AM2320 read ---");
+
+            // Wake-up via clock divider trick. Lower the I2C clock to ~10 kHz
+            // so the wake address byte takes ~900 microseconds on the bus.
+            // The AM2320 datasheet requires SDA to be held low for at least
+            // 800 microseconds during the wake transaction; this satisfies
+            // that requirement without needing a dedicated hardware state.
+            i2c_wait_idle();
+            i2c_set_clkdiv(5000);
+
+            i2c_start();
+            let wake_acked = i2c_write_byte((0x5C << 1) | 0);
+            i2c_stop();
+            println!("Wake ACK: {} (expected: false)", wake_acked);
+
+            // Restore standard 100 kHz for the actual read transaction.
+            i2c_wait_idle();
+            i2c_set_clkdiv(500);
+
+            // Small delay before next transaction to let the sensor settle.
+            delay_cycles(200_000); // 2 ms
+
+            // Send Modbus read command: function 0x03, start register 0x00, length 4.
+            // This requests humidity (regs 0-1) and temperature (regs 2-3).
+            let cmd = [0x03u8, 0x00, 0x04];
+            let cmd_ok = i2c_write_bytes(0x5C, &cmd);
+            println!("Cmd ACK: {} (expected: true)", cmd_ok);            
+
+            if cmd_ok {
+                delay_cycles(500_000); // 5 ms
+                
+                println!("Repeated START test: read byte 0, then re-address sensor");
+
+                i2c_start();
+                let addr_ok = i2c_write_byte((0x5C << 1) | 1);
+                println!("  Initial addr ACK: {} status={:02X}", addr_ok, i2c_status());
+
+                if addr_ok {
+                    delay_cycles(5_000);
+                    let byte0 = i2c_read_byte(true);
+                    println!("  Byte 0: {:02X} status={:02X}", byte0, i2c_status());
+
+                    i2c_start(); // Repeated START
+                    let readdr_ok = i2c_write_byte((0x5C << 1) | 1);
+                    println!("  Re-addr ACK: {} status={:02X}", readdr_ok, i2c_status());
+                }
+                i2c_stop();
+            }
+        }
+
+        // 6) Small delay to set animation speed.
         for _ in 0..150_000 {
             unsafe { core::arch::asm!("nop"); }
         }
     }
 }
 
-// ── 9. Panic Handler ────────────────────────────────────────────────────────
+// ── 11. Panic Handler ────────────────────────────────────────────────────────
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     // freeze the system and print panic info to UART
