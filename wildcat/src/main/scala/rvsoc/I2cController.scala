@@ -188,21 +188,46 @@ class I2cController(systemClockHz: Int = 100_000_000,
         }
       }
     }
-
+    
     // ---- sStart: generate START condition -----
-    // Assumes bus is idle (SDA = HIGH, SCL = HIGH) when entering.
-    //  Phase 0: pull SDA LOW while SCL is HIGH -> START condition
-    //  Phase 1: pull SCL LOW, ready for first bit
-    //  Phase 2,3: (unused, go to idle immediately)
+    // Works for both fresh START (bus already idle) and repeated START
+    // (coming from read/write where SDA and/or SCL may be LOW).
+    //
+    // I2C START requires SDA to fall from HIGH to LOW WHILE SCL is HIGH.
+    // For a repeated START we cannot assume the lines are HIGH on entry, so
+    // we must explicitly release them first and let the pull-ups raise them
+    // before generating the falling edge on SDA.
+    //
+    //  Phase 0: release SDA and SCL, wait for both to go HIGH
+    //  Phase 1: drive SDA LOW (SCL still HIGH) -> START condition
+    //  Phase 2: drive SCL LOW, ready for first bit
+    //  Phase 3: done, return to idle
     is(sStart) {
       when(phase === 0.U) {
-        sdaOeReg := true.B // Drive SDA LOW
-        sclOeReg := false.B // SCL stays HIGH
+        sdaOeReg := false.B // Release SDA (pull-up brings it HIGH)
+        sclOeReg := false.B // Release SCL (pull-up brings it HIGH)
+
+        // Wait until both lines are actually HIGH before continuing.
+        // Handles slow pull-up rise and any clock stretching by the slave.
+        when(!io.sclIn || !io.sdaIn) {
+          phase := phase
+          tickCounter := 0.U
+        }
       }.elsewhen(phase === 1.U) {
-        sdaOeReg := true.B // stays LOW
-        sclOeReg := true.B // pull SCL LOW
+        sdaOeReg := true.B  // Drive SDA LOW -> START edge
+        sclOeReg := false.B // SCL still HIGH
+
+        // Keep SCL HIGH even if it tries to droop (shouldn't happen
+        // since slave should not stretch clock with no clock running)
+        when(!io.sclIn) {
+          phase := phase
+          tickCounter := 0.U
+        }
+      }.elsewhen(phase === 2.U) {
+        sdaOeReg := true.B  // SDA stays LOW
+        sclOeReg := true.B  // Drive SCL LOW, ready for first bit
       }.otherwise {
-        // Phase 2 or 3: START is complete, return to idle
+        // Phase 3: START complete, return to idle
         state := sIdle
       }
     }
