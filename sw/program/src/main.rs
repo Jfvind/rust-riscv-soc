@@ -477,30 +477,32 @@ fn main() {
 
             if cmd_ok {
                 delay_cycles(500_000); // 5 ms
+                
+                // EFTER:
+                // Full Modbus read: function code (1) + byte count (1) +
+                // humidity high/low (2) + temperature high/low (2) +
+                // CRC low/high (2) = 8 bytes total.
+                let mut buf = [0u8; 8];
+                let read_ok = i2c_read_bytes(0x5C, &mut buf);
+                println!("Read OK: {}", read_ok);
+                println!("Bytes: {:02X} {:02X} {:02X} {:02X} {:02X} {:02X} {:02X} {:02X}",
+                    buf[0], buf[1], buf[2], buf[3], buf[4], buf[5], buf[6], buf[7]);
 
-                // ===== Pure sReadAck test =====
-                // Read 2 bytes back-to-back without any repeated START.
-                // Byte 0 is ACK'ed (more bytes coming), byte 1 is NACK'ed
-                // (last byte). If the sReadAck fix works, byte 1 should be
-                // actual sensor data (probably 0x04 = Modbus byte count).
-                // If byte 1 is still 0xFF, the fix did not take effect.
-                println!("Pure sReadAck test: read 2 bytes back-to-back");
+                if read_ok && buf[0] == 0x03 && buf[1] == 0x04 {
+                    let humidity_raw = ((buf[2] as u16) << 8) | (buf[3] as u16);
+                    let temp_raw = ((buf[4] as u16) << 8) | (buf[5] as u16);
 
-                i2c_start();
-                let addr_ok = i2c_write_byte((0x5C << 1) | 1);
-                println!("  Addr+R ACK: {} status={:02X}", addr_ok, i2c_status());
+                    // Sensor reports 10x actual value, so 658 means 65.8.
+                    // Print as integer + decimal since no_std has no float
+                    // formatting by default.
+                    let hum_int = humidity_raw / 10;
+                    let hum_dec = humidity_raw % 10;
+                    let temp_int = temp_raw / 10;
+                    let temp_dec = temp_raw % 10;
 
-                if addr_ok {
-                    delay_cycles(5_000); // 50 us
-
-                    let byte0 = i2c_read_byte(true);  // ACK to byte 0
-                    println!("  Byte 0: {:02X} status={:02X}", byte0, i2c_status());
-
-                    let byte1 = i2c_read_byte(false); // NACK to byte 1 (last)
-                    println!("  Byte 1: {:02X} status={:02X}", byte1, i2c_status());
-                    println!("  Verdict: byte1=FF means sReadAck STILL broken, anything else means FIXED");
+                    println!("Humidity: {}.{}% RH", hum_int, hum_dec);
+                    println!("Temperature: {}.{} C", temp_int, temp_dec);
                 }
-                i2c_stop();
             }
         }
 
