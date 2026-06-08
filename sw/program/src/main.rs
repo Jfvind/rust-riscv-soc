@@ -123,7 +123,7 @@ impl Pmod {
 }
 
 // ── 8. HAL: LED helper + BTN helper + ADC helper ─────────────────────────────────────────────────────
-fn led_write(val: u8) { // LED = 1 on, LED = 0 off, bitmask for 8 LEDs
+fn led_write(val: u16) { // LED = 1 on, LED = 0 off, bitmask for 8 LEDs
     unsafe {
         LED_REG.write_volatile(val as u32);
     }
@@ -188,15 +188,23 @@ fn main() {
         let adc_val = adc_read_all(); // Returns 0 to 4095 for all four inputs
         let btn_val = btn_read(); // Use buttons 0..2 for io_led[8..10]
 
-        // 2) ADC bargraph on io_led[0..6] using direct thresholds.
-        let mut adc_leds: u8 = 0;
-        if adc_val[0] > 512  { adc_leds |= 0b0000001; }
-        if adc_val[0] > 1024 { adc_leds |= 0b0000011; }
-        if adc_val[0] > 1536 { adc_leds |= 0b0000111; }
-        if adc_val[0] > 2048 { adc_leds |= 0b0001111; }
-        if adc_val[0] > 2560 { adc_leds |= 0b0011111; }
-        if adc_val[0] > 3072 { adc_leds |= 0b0111111; }
-        if adc_val[0] > 3584 { adc_leds |= 0b1111111; }
+        // 2) ADC bargraph on io_led[0..15] using direct thresholds.
+        let mut adc_leds: u16 = 0;
+        if adc_val[0] > 256  { adc_leds |= 0b1000_0000_0000_0000; }
+        if adc_val[0] > 512  { adc_leds |= 0b1100_0000_0000_0000; }
+        if adc_val[0] > 768  { adc_leds |= 0b1110_0000_0000_0000; }
+        if adc_val[0] > 1024 { adc_leds |= 0b1111_0000_0000_0000; }
+        if adc_val[0] > 1280 { adc_leds |= 0b1111_1000_0000_0000; }
+        if adc_val[0] > 1536 { adc_leds |= 0b1111_1100_0000_0000; }
+        if adc_val[0] > 1792 { adc_leds |= 0b1111_1110_0000_0000; }
+        if adc_val[0] > 2048 { adc_leds |= 0b1111_1111_0000_0000; }
+        if adc_val[0] > 2304 { adc_leds |= 0b1111_1111_1000_0000; }
+        if adc_val[0] > 2560 { adc_leds |= 0b1111_1111_1100_0000; }
+        if adc_val[0] > 2816 { adc_leds |= 0b1111_1111_1110_0000; }
+        if adc_val[0] > 3072 { adc_leds |= 0b1111_1111_1111_0000; }
+        if adc_val[0] > 3328 { adc_leds |= 0b1111_1111_1111_1000; }
+        if adc_val[0] > 3584 { adc_leds |= 0b1111_1111_1111_1100; }
+        if adc_val[0] > 3840 { adc_leds |= 0b1111_1111_1111_1110; }
         led_write(adc_leds);
 
         // 3) Button mirror on JA[1..3].

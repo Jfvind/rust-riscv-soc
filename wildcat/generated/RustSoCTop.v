@@ -2223,23 +2223,23 @@ end // initial
 `endif // SYNTHESIS
 endmodule
 module RustSoCTop(
-  input        clock,
-  input        reset,
-  inout  [7:0] io_gpioJA, // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 87:14]
-  inout  [7:0] io_gpioJB, // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 87:14]
-  inout  [7:0] io_gpioJC, // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 87:14]
-  output       io_tx, // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 87:14]
-  input        io_rx, // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 87:14]
-  output [7:0] io_led, // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 87:14]
-  input  [3:0] io_btn, // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 87:14]
-  input        io_vauxp6, // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 87:14]
-  input        io_vauxn6, // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 87:14]
-  input        io_vauxp14, // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 87:14]
-  input        io_vauxn14, // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 87:14]
-  input        io_vauxp7, // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 87:14]
-  input        io_vauxn7, // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 87:14]
-  input        io_vauxp15, // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 87:14]
-  input        io_vauxn15 // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 87:14]
+  input         clock,
+  input         reset,
+  inout  [7:0]  io_gpioJA, // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 87:14]
+  inout  [7:0]  io_gpioJB, // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 87:14]
+  inout  [7:0]  io_gpioJC, // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 87:14]
+  output        io_tx, // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 87:14]
+  input         io_rx, // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 87:14]
+  output [15:0] io_led, // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 87:14]
+  input  [3:0]  io_btn, // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 87:14]
+  input         io_vauxp6, // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 87:14]
+  input         io_vauxn6, // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 87:14]
+  input         io_vauxp14, // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 87:14]
+  input         io_vauxn14, // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 87:14]
+  input         io_vauxp7, // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 87:14]
+  input         io_vauxn7, // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 87:14]
+  input         io_vauxp15, // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 87:14]
+  input         io_vauxn15 // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 87:14]
 );
 `ifdef RANDOMIZE_REG_INIT
   reg [31:0] _RAND_0;
@@ -2491,14 +2491,14 @@ module RustSoCTop(
   wire  finalJCOut_7 = gpioJCPwmEn[7] ? pwm_io_pwmOut[23] : gpioJCOutReg[7]; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 337:25]
   wire [3:0] bufJC_io_out_lo = {finalJCOut_3,finalJCOut_2,finalJCOut_1,finalJCOut_0}; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 339:30]
   wire [3:0] bufJC_io_out_hi = {finalJCOut_7,finalJCOut_6,finalJCOut_5,finalJCOut_4}; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 339:30]
-  reg [6:0] ledReg; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 348:50]
+  reg [15:0] ledReg; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 348:50]
   wire  _isMMIOWrite_T_2 = cpuRunning & cpu_io_dmem_address[31:28] == 4'hf; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 351:32]
   wire  isMMIOWrite = cpuRunning & cpu_io_dmem_address[31:28] == 4'hf & cpu_io_dmem_wr; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 351:75]
   wire [3:0] modSel = cpu_io_dmem_address[23:20]; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 353:37]
   wire [7:0] offset = cpu_io_dmem_address[7:0]; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 354:37]
   wire  _T_9 = offset == 8'h4; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 358:21]
   wire  _T_11 = offset == 8'h0; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 361:21]
-  wire [6:0] _GEN_34 = offset == 8'h0 ? cpu_io_dmem_wrData[6:0] : ledReg; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 361:{30,39} 348:50]
+  wire [15:0] _GEN_34 = offset == 8'h0 ? cpu_io_dmem_wrData[15:0] : ledReg; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 361:{30,39} 348:50]
   wire [15:0] _GEN_35 = _T_11 ? cpu_io_dmem_wrData[15:0] : pwmEnable; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 364:{30,42} 252:53]
   wire [7:0] _GEN_36 = _T_9 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_0; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 366:44 253:55 366:61]
   wire [7:0] _GEN_37 = offset == 8'h8 ? cpu_io_dmem_wrData[7:0] : pwmDutyRegs_1; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 366:44 253:55 366:61]
@@ -2820,7 +2820,7 @@ module RustSoCTop(
     .io_out(gpioJCDebouncer_io_out)
   );
   assign io_tx = cpuRunning ? uartTx_io_txd : 1'h1; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 268:15]
-  assign io_led = {cpuRunning,ledReg}; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 442:24]
+  assign io_led = ledReg; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 442:10]
   assign resetRx_clock = clock;
   assign resetRx_reset = reset;
   assign resetRx_io_rxd = io_rx; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 114:18]
@@ -3229,7 +3229,7 @@ module RustSoCTop(
       end
     end
     if (combinedReset) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 348:50]
-      ledReg <= 7'h0; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 348:50]
+      ledReg <= 16'h0; // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 348:50]
     end else if (isMMIOWrite) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 352:21]
       if (!(4'h0 == modSel)) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 356:20]
         if (4'h1 == modSel) begin // @[\\src\\main\\scala\\rvsoc\\RustSoCTop.scala 356:20]
@@ -3349,7 +3349,7 @@ initial begin
   _RAND_35 = {1{`RANDOM}};
   gpioJCPwmEn = _RAND_35[7:0];
   _RAND_36 = {1{`RANDOM}};
-  ledReg = _RAND_36[6:0];
+  ledReg = _RAND_36[15:0];
   _RAND_37 = {1{`RANDOM}};
   memAddressReg = _RAND_37[31:0];
   _RAND_38 = {1{`RANDOM}};

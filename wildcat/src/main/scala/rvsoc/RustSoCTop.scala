@@ -90,7 +90,7 @@ class RustSoCTop(frequ: Int = 100000000, baudRate: Int = 115200, memBytes: Int =
     val gpioJC      = Analog(8.W)
     val tx          = Output(UInt(1.W))
     val rx          = Input(UInt(1.W))
-    val led         = Output(UInt(8.W))
+    val led         = Output(UInt(16.W))
     val btn         = Input(UInt(4.W))
 
     val vauxp6      = Input(Bool())
@@ -345,7 +345,7 @@ class RustSoCTop(frequ: Int = 100000000, baudRate: Int = 115200, memBytes: Int =
   // ====================================
   // Memory-mapped IO Decoder
   // ====================================
-  val ledReg = withReset(combinedReset) { RegInit(0.U(7.W)) }
+  val ledReg = withReset(combinedReset) { RegInit(0.U(16.W)) }
 
   // --- Immediate writes (Using current cycle values 'address' and 'wr')
   val isMMIOWrite = cpuRunning && (cpu.io.dmem.address(31, 28) === 0xf.U) && cpu.io.dmem.wr
@@ -358,7 +358,7 @@ class RustSoCTop(frequ: Int = 100000000, baudRate: Int = 115200, memBytes: Int =
         when(offset === 4.U) { uartTx.io.channel.valid := true.B }
       }
       is(1.U) { // on-board LEDs (0xF010)
-        when(offset === 0.U) { ledReg := cpu.io.dmem.wrData(6, 0) }
+        when(offset === 0.U) { ledReg := cpu.io.dmem.wrData(15, 0) }
       }
       is(4.U) { // PWM (0xF040)
         when(offset === 0.U) { pwmEnable := cpu.io.dmem.wrData(15, 0) }
@@ -439,7 +439,7 @@ class RustSoCTop(frequ: Int = 100000000, baudRate: Int = 115200, memBytes: Int =
   uartRx.io.channel.ready := cpuRunning && (cpu.io.dmem.address(31, 28) === 0xf.U) && (cpu.io.dmem.address(23, 20) === 0.U) && (cpu.io.dmem.address(7, 0)   === 4.U) && cpu.io.dmem.rd
 
   // --- LED ---
-  io.led := cpuRunning ## ledReg
+  io.led := ledReg
 }
 
 /**
