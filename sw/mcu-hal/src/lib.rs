@@ -1,3 +1,5 @@
+#![no_std]
+
 use core::fmt::{self, Write};
 
 const UART_STATUS: *const u32 = 0xF000_0000 as *const u32;
@@ -31,7 +33,7 @@ impl Write for Uart {
 macro_rules! print {
     ($($arg:tt)*) => {{
         use core::fmt::Write;
-        let _ = $crate::hal::Uart::new().write_fmt(format_args!($($arg)*));
+        let _ = $crate::Uart::new().write_fmt(format_args!($($arg)*));
     }};
 }
 

@@ -168,7 +168,7 @@ gør dette.
 ## HAL-reference: tilgængelige funktioner og adresser
 
 Følgende funktioner udgør det Hardware Abstraction Layer (HAL) 
-der er implementeret i `sw/program/src/hal.rs` og bruges fra `sw/program/src/app.rs`. Disse funktioner abstraherer 
+der er implementeret i `sw/mcu-hal/src/lib.rs` og bruges fra `sw/program/src/app.rs`. Disse funktioner abstraherer 
 den underliggende Memory-Mapped I/O, så du ikke behøver at 
 arbejde direkte med hukommelsesadresser.
 
@@ -417,7 +417,7 @@ fn main() {
 - RGB-LED på pin 12-14 fader langsomt op til fuld rød, ned til slukket, op til fuld grøn, ned, op til fuld blå, ned, og gentager
 
 **Bemærk:** Hvis din RGB-LED er common-cathode i stedet for common-anode, skal 
-`rgb_set`-funktionen i `sw/program/src/hal.rs` ændres så den ikke inverterer værdierne 
+`rgb_set`-funktionen i `sw/mcu-hal/src/lib.rs` ændres så den ikke inverterer værdierne 
 (fjern `100 -` foran `r`, `g`, `b`).
 
 ## Fejlfinding
@@ -481,7 +481,7 @@ pwm_set(0, 50);                     // Nu virker denne linje
 
 ### RGB-LED lyser modsat forventet (høj værdi = mørk)
 
-Din RGB-LED er sandsynligvis *common-cathode* i stedet for *common-anode*. HAL-funktionen `rgb_set` inverterer værdierne som standard fordi den antager common-anode. For en common-cathode LED skal du ændre `rgb_set` i `sw/program/src/hal.rs` så inverteringen fjernes:
+Din RGB-LED er sandsynligvis *common-cathode* i stedet for *common-anode*. HAL-funktionen `rgb_set` inverterer værdierne som standard fordi den antager common-anode. For en common-cathode LED skal du ændre `rgb_set` i `sw/mcu-hal/src/lib.rs` så inverteringen fjernes:
 
 ```rust
 fn rgb_set(r: u8, g: u8, b: u8) {

@@ -29,6 +29,6 @@ pub unsafe extern "C" fn rust_entry() -> ! {
 
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
-    crate::println!("\n[CPU PANIC]: {}", info);
+    mcu_hal::println!("\n[CPU PANIC]: {}", info);
     loop {}
 }

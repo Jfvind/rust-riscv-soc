@@ -196,6 +196,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "mcu-hal"
+version = "0.1.0"
+
+[[package]]
 name = "nix"
 version = "0.26.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -230,6 +234,9 @@ dependencies = [
 [[package]]
 name = "program"
 version = "0.1.0"
+dependencies = [
+ "mcu-hal",
+]
 
 [[package]]
 name = "quote"

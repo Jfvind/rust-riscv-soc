@@ -1,9 +1,9 @@
-use crate::hal::{adc_read_all, btn_read, led_write, rgb_set, Pmod};
+use mcu_hal::{adc_read_all, btn_read, led_write, rgb_set, Pmod};
 
 pub fn main() -> ! {
-    crate::println!("=== DTU MCU Booted ===");
-    crate::println!("SRAM Size: {} bytes", 4096);
-    crate::println!("Status: PASS");
+    mcu_hal::println!("=== DTU MCU Booted ===");
+    mcu_hal::println!("SRAM Size: {} bytes", 4096);
+    mcu_hal::println!("Status: PASS");
 
     Pmod::JA.set_dir(0b0111_0111);
     Pmod::JA.set_pwm_en(0b_0111_0000);
