@@ -79,9 +79,9 @@ Når først SoC'en er flashet, kan du uploade Rust-programmer (igen og igen) via
 **Itterer i jeres program design:**
 Efterfølgende ændringer i Rust-koden kan uploades ved at køre `cargo xtask upload <din_port>` igen. Det er ikke nødvændigt at reflashe SoC'en for at uplade nye programmer. 
 
-Testkredsløbet herunder er det hardware-setup, som bruges af koden der aktuelt kører i [sw/program/src/main.rs](sw/program/src/main.rs).
+Testkredsløbet herunder er det hardware-setup, som bruges af koden der aktuelt kører i [sw/program/src/app.rs](sw/program/src/app.rs).
 
-![Test circuit for main.rs](Test-circuit.png)
+![Test circuit for app.rs](Test-circuit.png)
 
 ## Systemarkitektur - CPU, hukommelse, boot-flow og memory map
 
@@ -143,7 +143,7 @@ Adresserummet er delt i tre områder: IMEM til instruktioner, DMEM til data og s
 
 ## Workflow - fra Rust-kode til kørende program
 Når du udvikler programmer til denne SoCc, er dit workflow:
-1. Skriv eller rediger dit Rust-program i filen `sw/program/src/main.rs`
+1. Skriv eller rediger dit Rust-program i filen `sw/program/src/app.rs`
 2. Kør kommandoen `cargo xtask upload <din_port>` fra roden af repoet (`.../rust-riscv-soc`)
 3. Dit program kompileres, uploades, og begynder at eksekvere automatisk.
 
@@ -156,7 +156,7 @@ Kommandoen `cargo xtask upload` automatiserer følgende kæde af handlinger:
 
 ### Filstruktur
 
-Dit Rust-program skrives i filen `sw/program/src/main.rs`. Det 
+Dit Rust-program skrives i filen `sw/program/src/app.rs`. Det 
 er den eneste fil du behøver at redigere under normal brug.
 
 **Note:** Hvis du løber ind i hukommelsesbegrænsninger (4 KB instruktioner eller 4 KB data/stack),
@@ -168,7 +168,7 @@ gør dette.
 ## HAL-reference: tilgængelige funktioner og adresser
 
 Følgende funktioner udgør det Hardware Abstraction Layer (HAL) 
-der er tilgængeligt i `main.rs`. Disse funktioner abstraherer 
+der er implementeret i `sw/program/src/hal.rs` og bruges fra `sw/program/src/app.rs`. Disse funktioner abstraherer 
 den underliggende Memory-Mapped I/O, så du ikke behøver at 
 arbejde direkte med hukommelsesadresser.
 
@@ -417,7 +417,7 @@ fn main() {
 - RGB-LED på pin 12-14 fader langsomt op til fuld rød, ned til slukket, op til fuld grøn, ned, op til fuld blå, ned, og gentager
 
 **Bemærk:** Hvis din RGB-LED er common-cathode i stedet for common-anode, skal 
-`rgb_set`-funktionen i `main.rs` ændres så den ikke inverterer værdierne 
+`rgb_set`-funktionen i `sw/program/src/hal.rs` ændres så den ikke inverterer værdierne 
 (fjern `100 -` foran `r`, `g`, `b`).
 
 ## Fejlfinding
@@ -481,7 +481,7 @@ pwm_set(0, 50);                     // Nu virker denne linje
 
 ### RGB-LED lyser modsat forventet (høj værdi = mørk)
 
-Din RGB-LED er sandsynligvis *common-cathode* i stedet for *common-anode*. HAL-funktionen `rgb_set` inverterer værdierne som standard fordi den antager common-anode. For en common-cathode LED skal du ændre `rgb_set` i `main.rs` så inverteringen fjernes:
+Din RGB-LED er sandsynligvis *common-cathode* i stedet for *common-anode*. HAL-funktionen `rgb_set` inverterer værdierne som standard fordi den antager common-anode. For en common-cathode LED skal du ændre `rgb_set` i `sw/program/src/hal.rs` så inverteringen fjernes:
 
 ```rust
 fn rgb_set(r: u8, g: u8, b: u8) {

@@ -131,13 +131,13 @@ If you see a version number, Make is already installed. This project now uses `c
 The hardware exposes three software-controlled PMOD GPIO connectors in addition to the onboard LEDs, buttons, and ADC:
 - Each PMOD pin has direction, output, input, and PWM-enable registers.
 - Each PMOD pin also has a debounced input register for external button reads.
-- GPIOs can be driven directly from Rust through the MMIO helpers - currently in `sw/program/src/main.rs`.
+- GPIOs can be driven directly from Rust through the MMIO helpers. Student code lives in `sw/program/src/app.rs`.
 - PMOD buttons can be wired from a GPIO pin to GND; internal pullups keep the idle state high.
 
-The test circuit below is the hardware setup used by the code currently running in [sw/program/src/main.rs](sw/program/src/main.rs).
+The test circuit below is the hardware setup used by the code currently running in [sw/program/src/app.rs](sw/program/src/app.rs).
 **Build the breadboard setup and power on the FPGA.**
 
-![Test circuit for main.rs](docs/diagrams/Test-circuit.png)
+![Test circuit for app.rs](docs/diagrams/Test-circuit.png)
 
 ![Quick workflow for running program on MCU](docs/diagrams/Rust-on-MCU-Quickguide.svg)
 See the detailed steps below
