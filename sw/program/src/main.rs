@@ -479,17 +479,30 @@ fn main() {
                 // Wait at least 1.5 ms for the sensor to prepare its reply.
                 delay_cycles(500_000); // 5 ms
 
-                // Read 8-byte response:
-                // [0]=0x03 [1]=0x04 [2-3]=humidity [4-5]=temperature [6-7]=CRC
+                // Manually unrolled read transaction for full visibility:
+                // address ACK, every byte, and controller status after each.
                 let mut response = [0u8; 8];
-                let read_ok = i2c_read_bytes(0x5C, &mut response);
 
-                if read_ok && response[0] == 0x03 && response[1] == 0x04 {
-                    // Combine MSB and LSB into 16-bit values.
+                i2c_start();
+                let addr_ok = i2c_write_byte((0x5C << 1) | 1);
+                println!("Read addr ACK: {} status={:02X}", addr_ok, i2c_status());
+
+                if addr_ok {
+                    // AM2320 needs 30+ us after the address byte before the
+                    // first data clock. 5000 cycles = 50 us.
+                    delay_cycles(5_000);
+                    for i in 0..8 {
+                        let send_ack = i != 7;
+                        response[i] = i2c_read_byte(send_ack);
+                        println!("  Byte {}: {:02X} status={:02X}", i, response[i], i2c_status());
+                    }
+                }
+                i2c_stop();
+
+                if addr_ok && response[0] == 0x03 && response[1] == 0x04 {
                     let humidity = ((response[2] as u16) << 8) | (response[3] as u16);
                     let temperature = (((response[4] as u16) << 8) | (response[5] as u16)) as i16;
 
-                    // Values are in tenths: 234 means 23.4 C.
                     let temp_int = temperature / 10;
                     let temp_frac = (temperature % 10).abs();
                     let hum_int = humidity / 10;
